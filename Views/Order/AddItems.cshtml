@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Add Items";
+    var menuItems = ViewBag.MenuItems as List<RestaurantManagement.Models.MenuItem>;
+    var orderId = ViewBag.OrderId;
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-plus-circle"></i> Add Items to Order #@orderId (Table @ViewBag.TableNumber)</h1>
+    <a href="@Url.Action("Details", new { id = orderId })" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Order
+    </a>
+</div>
+
+<div class="row">
+    @if (menuItems != null)
+    {
+        @foreach (var item in menuItems)
+        {
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h6>@item.Name</h6>
+                    <div class="menu-item-price mb-2">$@item.Price.ToString("N2")</div>
+                    <small class="text-muted d-block mb-2">@item.Category?.Name</small>
+                    
+                    <form asp-action="AddItems" method="post" class="d-inline">
+                        <input type="hidden" name="orderId" value="@orderId" />
+                        <input type="hidden" name="menuItemId" value="@item.Id" />
+                        <div class="input-group input-group-sm">
+                            <input type="number" name="quantity" class="form-control" value="1" min="1" max="10" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    }
+</div>

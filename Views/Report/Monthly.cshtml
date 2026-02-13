@@ -1,0 +1,206 @@
+@model RestaurantManagement.ViewModels.MonthlyReportViewModel
+@{
+    ViewData["Title"] = "Monthly Report";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-calendar-month"></i> Monthly Report</h1>
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+        <form class="d-flex gap-2">
+            <select name="month" class="form-select">
+                @foreach (var m in ViewBag.AvailableMonths)
+                {
+                    <option value="@m.Month" selected="@(m.Month == Model.Month)">@m.Name</option>
+                }
+            </select>
+            <select name="year" class="form-select">
+                @foreach (var y in ViewBag.AvailableYears)
+                {
+                    <option value="@y" selected="@(y == Model.Year)">@y</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="stat-card blue">
+            <div class="stat-value">@Model.TotalOrders</div>
+            <div class="stat-label">Total Orders</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card yellow">
+            <div class="stat-value">$@Model.TotalRevenue.ToString("N0")</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card dark">
+            <div class="stat-value">$@Model.AverageOrderValue.ToString("N2")</div>
+            <div class="stat-label">Avg Order Value</div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Trend Chart -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-graph-up"></i> Sales Trend
+    </div>
+    <div class="card-body">
+        <canvas id="salesTrendChart" style="max-height: 300px;"></canvas>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Top Selling Items -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-star"></i> Top Selling Items (Revenue)
+            </div>
+            <div class="card-body">
+                <canvas id="topItemsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Performance -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-people"></i> Employee Performance
+            </div>
+            <div class="card-body">
+                <canvas id="employeeChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Summary -->
+<div class="card mt-3">
+    <div class="card-header">
+        <i class="bi bi-bar-chart"></i> Daily Summary - @Model.MonthName @Model.Year
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Orders</th>
+                        <th>Revenue</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var day in Model.DailySummaries.Where(d => d.OrderCount > 0 || d.Revenue > 0))
+                    {
+                        <tr>
+                            <td>@day.Date.ToString("MMM dd, ddd")</td>
+                            <td>@day.OrderCount</td>
+                            <td>$@day.Revenue.ToString("N2")</td>
+                            <td>
+                                <a href="@Url.Action("Daily", new { date = day.Date.ToString("yyyy-MM-dd") })" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.DailySummaries.Any(d => d.OrderCount > 0))
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No orders this month</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sales Trend Chart
+        const trendCtx = document.getElementById('salesTrendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.DailySummaries.Select(x => $"'{x.Date:dd}'")))],
+                datasets: [{
+                    label: 'Daily Revenue',
+                    data: [@string.Join(",", Model.DailySummaries.Select(x => x.Revenue))],
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Top Items Chart
+        const topItemsCtx = document.getElementById('topItemsChart').getContext('2d');
+        new Chart(topItemsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.TopSellingItems.Select(x => $"'{x.ItemName}'")))],
+                datasets: [{
+                    data: [@string.Join(",", Model.TopSellingItems.Select(x => x.Revenue))],
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+
+        // Employee Performance Chart
+        const empCtx = document.getElementById('employeeChart').getContext('2d');
+        new Chart(empCtx, {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.EmployeePerformances.Select(x => $"'{x.EmployeeName}'")))],
+                datasets: [{
+                    label: 'Total Sales ($)',
+                    data: [@string.Join(",", Model.EmployeePerformances.Select(x => x.TotalSales))],
+                    backgroundColor: '#198754'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}

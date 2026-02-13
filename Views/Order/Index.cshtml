@@ -1,0 +1,86 @@
+@model List<RestaurantManagement.Models.Order>
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-receipt"></i> Orders</h1>
+    <a href="@Url.Action("Create")" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> New Order
+    </a>
+</div>
+
+<!-- Status Filter -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="@Url.Action("Index")" class="btn btn-sm @(ViewBag.StatusFilter == null ? "btn-primary" : "btn-outline-primary")">All</a>
+            <a href="@Url.Action("Index", new { status = "Pending" })" class="btn btn-sm @(ViewBag.StatusFilter == "Pending" ? "btn-warning" : "btn-outline-warning")">Pending</a>
+            <a href="@Url.Action("Index", new { status = "Preparing" })" class="btn btn-sm @(ViewBag.StatusFilter == "Preparing" ? "btn-primary" : "btn-outline-primary")">Preparing</a>
+            <a href="@Url.Action("Index", new { status = "Ready" })" class="btn btn-sm @(ViewBag.StatusFilter == "Ready" ? "btn-success" : "btn-outline-success")">Ready</a>
+            <a href="@Url.Action("Index", new { status = "Delivered" })" class="btn btn-sm @(ViewBag.StatusFilter == "Delivered" ? "btn-dark" : "btn-outline-dark")">Delivered</a>
+            <a href="@Url.Action("Index", new { status = "Cancelled" })" class="btn btn-sm @(ViewBag.StatusFilter == "Cancelled" ? "btn-danger" : "btn-outline-danger")">Cancelled</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Table</th>
+                        <th>Created By</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td><strong>#@order.Id</strong></td>
+                            <td>Table @order.Table?.TableNumber</td>
+                            <td>@order.User?.FullName</td>
+                            <td>@order.OrderItems.Sum(oi => oi.Quantity) items</td>
+                            <td><strong class="text-primary">$@order.TotalAmount.ToString("N2")</strong></td>
+                            <td>
+                                <span class="badge-status badge-@order.Status.ToString().ToLower()">
+                                    @order.Status
+                                </span>
+                            </td>
+                            <td>
+                                @if (order.Payment != null)
+                                {
+                                    <span class="badge bg-success">@order.Payment.PaymentMethod</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Unpaid</span>
+                                }
+                            </td>
+                            <td>@order.OrderDate.ToString("MMM dd, HH:mm")</td>
+                            <td>
+                                <a href="@Url.Action("Details", new { id = order.Id })" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">No orders found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

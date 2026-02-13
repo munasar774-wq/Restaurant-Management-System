@@ -1,0 +1,344 @@
+@model RestaurantManagement.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<style>
+    /* Specific Design Overrides */
+    body {
+        background-color: #F0F2F5; /* Light gray background like mockup */
+    }
+
+    /* Curved Header */
+    .curved-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        height: 180px;
+        border-bottom-left-radius: 50% 20px;
+        border-bottom-right-radius: 50% 20px;
+        position: relative;
+        padding: 20px 40px;
+        color: white;
+        margin-bottom: -100px; /* Pull content up */
+        z-index: 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.2rem;
+        font-weight: 500;
+        opacity: 0.9;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+        padding: 0 40px 40px;
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Stat Cards - 2x2 Grid */
+    .stat-card-custom {
+        padding: 20px;
+        border-radius: 20px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.3s;
+    }
+
+    .stat-card-custom:hover { transform: translateY(-5px); }
+
+    .stat-card-custom .icon-box {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        opacity: 0.9;
+    }
+
+    .stat-card-custom .value {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    
+    .stat-card-custom .label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .stat-orange  { background: linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%); }
+    .stat-purple  { background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%); }
+    .stat-blue    { background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%); }
+    .stat-green   { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+
+    .badge-pill-custom {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255,255,255,0.2);
+        padding: 2px 10px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+    }
+
+    /* Revenue Card - Right Side */
+    .revenue-panel {
+        background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 30px;
+        padding: 30px;
+        height: 100%;
+        min-height: 400px;
+        color: #333;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    /* Simulate chart with CSS */
+    .chart-container {
+        height: 200px;
+        position: relative;
+        margin-top: auto;
+        margin-bottom: 20px;
+        opacity: 0.8;
+    }
+    
+    .chart-line {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* Simple CSS stroke representation */
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M0,45 C20,40 30,10 50,20 C70,30 80,10 100,5" fill="none" stroke="%233b82f6" stroke-width="2"/></svg>');
+        background-size: 100% 100%;
+    }
+
+    .chart-line-2 {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M0,50 C20,45 40,30 60,35 C80,40 90,20 100,15" fill="none" stroke="%2310b981" stroke-width="2"/></svg>');
+        background-size: 100% 100%;
+    }
+
+    /* Recent Orders Panel */
+    .recent-orders-panel {
+        background: white;
+        border-radius: 20px;
+        padding: 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        overflow: hidden;
+        margin-top: 30px;
+    }
+
+    .recent-header {
+        background: linear-gradient(to right, #eef2f3, #8e9eab);
+        padding: 15px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .table-custom th {
+        border-top: none;
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    
+    .table-custom td {
+        vertical-align: middle;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 12px 0.75rem;
+    }
+
+    /* Bottom Action Buttons */
+    .action-btn-custom {
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        border: none;
+        color: white;
+        transition: transform 0.2s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .action-btn-custom:hover { transform: translateY(-2px); color: white; }
+
+    .btn-purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .btn-orange { background: linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%); }
+    .btn-blue   { background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%); }
+
+</style>
+
+<!-- Custom Curved Header -->
+<div class="curved-header">
+    <div class="header-brand">
+        <i class="bi bi-ui-checks-grid"></i> Nexora Admin / Maamulka
+    </div>
+    <!-- Search and Profile moved to Global Top Navbar -->
+</div>
+
+<div class="dashboard-container">
+    <div class="row g-4">
+        <!-- LEFT COLUMN: Stat Grid + Recent Orders -->
+        <div class="col-lg-5 col-xl-5">
+            
+            <!-- 2x2 Stat Grid -->
+            <div class="row g-3">
+                <!-- Orders -->
+                <div class="col-6">
+                    <div class="stat-card-custom stat-orange">
+                        <span class="badge-pill-custom">+30%</span>
+                        <div class="icon-box"><i class="bi bi-cart-fill"></i></div>
+                        <div>
+                            <div class="value count-up">@Model.TotalOrders</div>
+                            <div class="label">Orders / Dalabaadka</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending -->
+                <div class="col-6">
+                    <div class="stat-card-custom stat-purple">
+                        <span class="badge-pill-custom">+10%</span>
+                        <div class="icon-box"><i class="bi bi-clock-history"></i></div>
+                        <div>
+                            <div class="value count-up">@Model.PendingOrders</div>
+                            <div class="label">Pending / Sugaya</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Revenue (Small) -->
+                <div class="col-6">
+                    <div class="stat-card-custom stat-blue">
+                        <span class="badge-pill-custom">+12%</span>
+                        <div class="icon-box"><i class="bi bi-currency-dollar"></i></div>
+                        <div>
+                            <div class="value count-up">$@Model.TodayRevenue.ToString("N0")</div>
+                            <div class="label">Revenue / Dakhliga</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- New Customers/Tables - Using Occupied Tables as proxy -->
+                <div class="col-6">
+                    <div class="stat-card-custom stat-green">
+                        <span class="badge-pill-custom">+5%</span>
+                        <div class="icon-box"><i class="bi bi-person-fill"></i></div>
+                        <div>
+                            <div class="value count-up">@Model.OccupiedTables</div>
+                            <div class="label">Active / Mashquul</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders List -->
+            <div class="recent-orders-panel">
+                <div class="recent-header">
+                    <span class="fw-bold text-dark">Recent Orders / Dalabaadkii Ugu Dambeeyay</span>
+                    <a href="@Url.Action("Index", "Order")" class="btn btn-sm btn-light rounded-pill px-3">View All / Arag Dhamaan</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Table / Miiska</th>
+                                <th>Items / Alaabta</th>
+                                <th>Status / Xaalada</th>
+                                <th>Time / Waqtiga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             @foreach (var order in Model.RecentOrders.Take(5))
+                            {
+                                <tr>
+                                    <td class="text-muted">#@order.Id</td>
+                                    <td class="fw-bold">T-@order.Table?.TableNumber</td>
+                                    <td class="text-truncate" style="max-width: 100px;">@order.OrderItems.FirstOrDefault()?.MenuItem?.Name</td>
+                                    <td>
+                                        @if(order.Status == RestaurantManagement.Models.OrderStatus.Ready) {
+                                            <span class="text-success fw-bold">Ready / Diyaar</span>
+                                        } else if(order.Status == RestaurantManagement.Models.OrderStatus.Pending) {
+                                            <span class="text-warning fw-bold">Pending / Sugaya</span>
+                                        } else if(order.Status == RestaurantManagement.Models.OrderStatus.Preparing) {
+                                            <span class="text-primary fw-bold">Cooking / Bislayn</span>
+                                        } else {
+                                            <span class="text-secondary fw-bold">@order.Status</span>
+                                        }
+                                    </td>
+                                    <td class="text-muted">@order.OrderDate.ToString("HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Large Revenue Card + Actions -->
+        <div class="col-lg-7 col-xl-7 d-flex flex-column">
+            
+            <!-- Revenue Overview Card -->
+            <div class="revenue-panel flex-grow-1" style="background-image: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); background-size: cover; position: relative;">
+                <!-- Overlay for glass effect -->
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.1); backdrop-filter: blur(50px); z-index: 0;"></div>
+                
+                <div style="position: relative; z-index: 1;">
+                    <h2 class="fw-bold text-white mb-1">Weekly Revenue / Dakhliga Todobaadka</h2>
+                    <h5 class="text-white-50">Overview / Guud Ahaan</h5>
+                </div>
+
+                <!-- Fake Chart Area -->
+                <div class="chart-container" style="position: relative; z-index: 1;">
+                    <div class="chart-line"></div>
+                    <div class="chart-line-2"></div>
+                </div>
+
+                <div style="position: relative; z-index: 1;">
+                    <h5 class="text-white-50 mb-0">This Week / Todobaadkan:</h5>
+                    <h1 class="fw-bold text-white">$@((Model.MonthlyRevenue / 4).ToString("N0"))</h1>
+                </div>
+            </div>
+
+            <!-- Action Buttons Row -->
+            <div class="d-flex gap-3 mt-4">
+                <a href="@Url.Action("Create", "Order")" class="action-btn-custom btn-purple flex-grow-1 text-center text-decoration-none">
+                    Add Order / Kudar Dalab
+                </a>
+                <a href="@Url.Action("Index", "Menu")" class="action-btn-custom btn-orange flex-grow-1 text-center text-decoration-none">
+                    Manage Menu / Maamul Cuntada
+                </a>
+                <a href="@Url.Action("Daily", "Report")" class="action-btn-custom btn-blue flex-grow-1 text-center text-decoration-none">
+                    View Reports / Arag Warbixinta
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

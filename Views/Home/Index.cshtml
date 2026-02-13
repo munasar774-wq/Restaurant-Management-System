@@ -1,0 +1,726 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "_PublicLayout";
+}
+
+<style>
+    /* Scroll Progress Indicator */
+    .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 4px;
+        background: linear-gradient(90deg, #ff0000, #ff7300, #ffd700);
+        z-index: 9999;
+        transition: width 0.1s ease;
+    }
+
+    /* Auto-Changing Background Hero Section */
+    .parallax-hero {
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .background-slideshow {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+    
+    .background-slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 2s ease-in-out;
+        filter: brightness(0.5);
+    }
+    
+    .background-slide.active {
+        opacity: 1;
+    }
+    
+    .background-slide:nth-child(1) {
+        background-image: url('https://images.unsplash.com/photo-1514362545857-3bc16549766b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    }
+    
+    .background-slide:nth-child(2) {
+        background-image: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    }
+    
+    .background-slide:nth-child(3) {
+        background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    }
+    
+    .background-slide:nth-child(4) {
+        background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    }
+    
+    .background-slide:nth-child(5) {
+        background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    }
+    
+    .parallax-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        color: white;
+    }
+    
+    .hero-title {
+        font-size: 5rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        background: linear-gradient(45deg, #ff0000, #ff7300, #ffd700);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientShift 3s ease infinite;
+        text-shadow: 0 0 30px rgba(255, 69, 0, 0.5);
+    }
+    
+    @@keyframes gradientShift {
+        0%, 100% { filter: hue-rotate(0deg); }
+        50% { filter: hue-rotate(20deg); }
+    }
+    
+    .hero-subtitle {
+        font-size: 1.8rem;
+        font-weight: 300;
+        letter-spacing: 2px;
+        margin-bottom: 2rem;
+        animation: fadeInUp 1s ease-out 0.5s both;
+    }
+    
+    .btn-fire {
+        background: linear-gradient(45deg, #ff0000, #ff7300);
+        border: none;
+        color: white;
+        padding: 18px 50px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s;
+        box-shadow: 0 0 30px rgba(255, 69, 0, 0.6);
+        animation: fadeInUp 1s ease-out 1s both;
+    }
+    
+    .btn-fire:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 10px 40px rgba(255, 69, 0, 0.8);
+        color: white;
+    }
+    
+    .btn-fire::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-fire:hover::before {
+        left: 100%;
+    }
+
+    /* Floating Elements */
+    .floating {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @@keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* Statistics Counter Section */
+    .stats-section {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .stat-card {
+        text-align: center;
+        padding: 30px;
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .stat-number {
+        font-size: 4rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, #ff0000, #ff7300);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+    
+    .stat-label {
+        font-size: 1.2rem;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    /* Featured Menu Section */
+    .menu-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        transition: all 0.4s;
+        cursor: pointer;
+    }
+    
+    .menu-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(255, 69, 0, 0.4);
+    }
+    
+    .menu-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        transition: transform 0.4s;
+    }
+    
+    .menu-card:hover img {
+        transform: scale(1.1);
+    }
+    
+    .menu-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        padding: 30px;
+        transform: translateY(10px);
+        transition: transform 0.4s;
+    }
+    
+    .menu-card:hover .menu-overlay {
+        transform: translateY(0);
+    }
+    
+    .menu-title {
+        color: white;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .menu-price {
+        color: #ff7300;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    /* Testimonials Section */
+    .testimonial-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 40px;
+        margin: 20px;
+        transition: all 0.3s;
+    }
+    
+    .testimonial-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-5px);
+    }
+    
+    .testimonial-text {
+        font-size: 1.1rem;
+        font-style: italic;
+        color: #fff;
+        margin-bottom: 20px;
+        line-height: 1.8;
+    }
+    
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .author-img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 3px solid #ff7300;
+    }
+    
+    .author-info h5 {
+        color: #fff;
+        margin: 0;
+        font-weight: bold;
+    }
+    
+    .author-info p {
+        color: #aaa;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    .stars {
+        color: #ffd700;
+        font-size: 1.2rem;
+    }
+
+    /* Newsletter Section */
+    .newsletter-section {
+        background: linear-gradient(135deg, #ff0000 0%, #ff7300 100%);
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .newsletter-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 15s ease-in-out infinite;
+    }
+    
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .newsletter-input {
+        border: none;
+        padding: 18px 25px;
+        border-radius: 50px 0 0 50px;
+        font-size: 1.1rem;
+        width: 100%;
+    }
+    
+    .newsletter-btn {
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        padding: 18px 40px;
+        border-radius: 0 50px 50px 0;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+    }
+    
+    .newsletter-btn:hover {
+        background: #000;
+        transform: translateX(5px);
+    }
+
+    /* Scroll Reveal */
+    .reveal {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s ease;
+    }
+    
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .reveal-left {
+        opacity: 0;
+        transform: translateX(-50px);
+        transition: all 0.8s ease;
+    }
+    
+    .reveal-left.active {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .reveal-right {
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.8s ease;
+    }
+    
+    .reveal-right.active {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Section Padding */
+    .section-padding {
+        padding: 100px 0;
+    }
+</style>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Auto-Changing Background Hero Section -->
+<section class="parallax-hero">
+    <!-- Background Slideshow -->
+    <div class="background-slideshow">
+        <div class="background-slide active"></div>
+        <div class="background-slide"></div>
+        <div class="background-slide"></div>
+        <div class="background-slide"></div>
+        <div class="background-slide"></div>
+    </div>
+    
+    <!-- Hero Content -->
+    <div class="parallax-content">
+        <h1 class="hero-title floating">NEXORA RESTAURANT</h1>
+        <p class="hero-subtitle">Experience Culinary Excellence</p>
+        <a href="@Url.Action("Login", "Account")" class="btn btn-fire rounded-pill">Reserve Your Table</a>
+    </div>
+</section>
+
+    <!-- Testimonials Section -->
+    <section class="py-5 bg-dark text-white">
+        <div class="container py-5">
+            <h2 class="text-center fw-bold mb-5" data-aos="fade-up">Real reviews from real people / Faallooyinka Macaamiisha</h2>
+            
+            <div class="row g-4 justify-content-center">
+                <!-- Review 1 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="glass-card h-100 p-4">
+                        <div class="text-warning mb-3">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="fst-italic mb-4">"The best dining experience I've ever had! The ambiance, service, and food quality are absolutely outstanding."</p>
+                        <p class="text-white-50 small mb-4">"Khibradii cunto ee ugu fiicnayd! Jawiga, adeegga, iyo tayada cuntada waa kuwo aad u heer sareeya."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-3" width="50" height="50" alt="Sarah">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Sarah Johnson</h6>
+                                <small class="text-white-50">Food Critic</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="glass-card h-100 p-4">
+                        <div class="text-warning mb-3">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="fst-italic mb-4">"Nexora has become my go-to restaurant. Every dish is a masterpiece, and the staff treats you like family."</p>
+                        <p class="text-white-50 small mb-4">"Nexora waxay noqotay makhaayadda aan ugu jecelahay. Cunto kasta waa farshaxan, shaqaaluhuna siday qoys oo kale ayay kuu soo dhaweynayaan."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-3" width="50" height="50" alt="Michael">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Michael Chen</h6>
+                                <small class="text-white-50">Regular Customer</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="glass-card h-100 p-4">
+                        <div class="text-warning mb-3">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="fst-italic mb-4">"From appetizers to desserts, everything is perfection. The chef's attention to detail is remarkable!"</p>
+                        <p class="text-white-50 small mb-4">"Laga bilaabo cunto-furna, ilaa macmacaanka, wax walba waa kaamil. Sida uu cunto-kariyuhu ugu taxadaro faahfaahinta waa mid cajiib ah!"</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" class="rounded-circle me-3" width="50" height="50" alt="Emma">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Emma Davis</h6>
+                                <small class="text-white-50">Food Blogger</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Statistics Counter Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-6 reveal">
+                <div class="stat-card">
+                    <div class="stat-number" data-target="15000">0</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 reveal">
+                <div class="stat-card">
+                    <div class="stat-number" data-target="250">0</div>
+                    <div class="stat-label">Menu Items</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 reveal">
+                <div class="stat-card">
+                    <div class="stat-number" data-target="50">0</div>
+                    <div class="stat-label">Expert Chefs</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 reveal">
+                <div class="stat-card">
+                    <div class="stat-number" data-target="12">0</div>
+                    <div class="stat-label">Years Experience</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Menu Section -->
+<section class="section-padding bg-dark">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 class="display-4 text-white fw-bold mb-3">Featured Dishes</h2>
+            <p class="text-white-50 fs-5">Discover our chef's special creations</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 reveal-left">
+                <div class="menu-card">
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Gourmet Salad">
+                    <div class="menu-overlay">
+                        <div class="menu-title">Gourmet Caesar Salad</div>
+                        <div class="menu-price">$12.99</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 reveal">
+                <div class="menu-card">
+                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Gourmet Pizza">
+                    <div class="menu-overlay">
+                        <div class="menu-title">Signature Wood-Fired Pizza</div>
+                        <div class="menu-price">$18.99</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 reveal-right">
+                <div class="menu-card">
+                    <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Gourmet Salad">
+                    <div class="menu-overlay">
+                        <div class="menu-title">Premium Wagyu Steak</div>
+                        <div class="menu-price">$45.99</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section-padding" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 class="display-4 text-white fw-bold mb-3">What Our Customers Say</h2>
+            <p class="text-white-50 fs-5">Real reviews from real people</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 reveal-left">
+                <div class="testimonial-card">
+                    <div class="stars mb-3">★★★★★</div>
+                    <p class="testimonial-text">"The best dining experience I've ever had! The ambiance, service, and food quality are absolutely outstanding."</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Johnson" class="author-img">
+                        <div class="author-info">
+                            <h5>Sarah Johnson</h5>
+                            <p>Food Critic</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 reveal">
+                <div class="testimonial-card">
+                    <div class="stars mb-3">★★★★★</div>
+                    <p class="testimonial-text">"Nexora has become my go-to restaurant. Every dish is a masterpiece, and the staff treats you like family."</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael Chen" class="author-img">
+                        <div class="author-info">
+                            <h5>Michael Chen</h5>
+                            <p>Regular Customer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 reveal-right">
+                <div class="testimonial-card">
+                    <div class="stars mb-3">★★★★★</div>
+                    <p class="testimonial-text">"From appetizers to desserts, everything is perfection. The chef's attention to detail is remarkable!"</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Emma Davis" class="author-img">
+                        <div class="author-info">
+                            <h5>Emma Davis</h5>
+                            <p>Food Blogger</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section">
+    <div class="container position-relative">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center reveal">
+                <h2 class="display-4 text-white fw-bold mb-3">Join Our Newsletter</h2>
+                <p class="text-white fs-5 mb-4">Get exclusive offers, recipes, and updates delivered to your inbox</p>
+                <div class="input-group input-group-lg">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email address">
+                    <button class="newsletter-btn">Subscribe</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Image Gallery Grid -->
+<section class="section-padding bg-dark">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-md-3 col-6 reveal">
+                <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="img-fluid w-100" style="height: 300px; object-fit: cover;" alt="Food 1">
+            </div>
+            <div class="col-md-3 col-6 reveal">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="img-fluid w-100" style="height: 300px; object-fit: cover;" alt="Food 2">
+            </div>
+            <div class="col-md-3 col-6 reveal">
+                <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="img-fluid w-100" style="height: 300px; object-fit: cover;" alt="Food 3">
+            </div>
+            <div class="col-md-3 col-6 reveal">
+                <img src="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="img-fluid w-100" style="height: 300px; object-fit: cover;" alt="Food 4">
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Scroll Progress Bar
+    window.addEventListener('scroll', () => {
+        const scrollProgress = document.getElementById('scrollProgress');
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrollPercentage = (scrollTop / scrollHeight) * 100;
+        scrollProgress.style.width = scrollPercentage + '%';
+    });
+
+    // Auto-Changing Background Slideshow
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.background-slide');
+    const totalSlides = slides.length;
+
+    function changeBackground() {
+        // Remove active class from current slide
+        slides[currentSlide].classList.remove('active');
+        
+        // Move to next slide
+        currentSlide = (currentSlide + 1) % totalSlides;
+        
+        // Add active class to new slide
+        slides[currentSlide].classList.add('active');
+    }
+
+    // Change background every 5 seconds
+    setInterval(changeBackground, 5000);
+
+    // Scroll Reveal Animation
+    function reveal() {
+        const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        reveals.forEach(element => {
+            const windowHeight = window.innerHeight;
+            const elementTop = element.getBoundingClientRect().top;
+            const elementVisible = 150;
+            
+            if (elementTop < windowHeight - elementVisible) {
+                element.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', reveal);
+    reveal(); // Initial check
+
+    // Counter Animation
+    function animateCounter(element) {
+        const target = parseInt(element.dataset.target);
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target.toLocaleString();
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current).toLocaleString();
+            }
+        }, 16);
+    }
+
+    // Trigger counter animation when stats section is visible
+    let counterAnimated = false;
+    window.addEventListener('scroll', () => {
+        if (counterAnimated) return;
+        
+        const statsSection = document.querySelector('.stats-section');
+        const rect = statsSection.getBoundingClientRect();
+        
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+            counterAnimated = true;
+            document.querySelectorAll('.stat-number').forEach(animateCounter);
+        }
+    });
+</script>

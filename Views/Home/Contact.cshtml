@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Contact Us";
+    Layout = "_PublicLayout";
+}
+
+<div class="container section-padding">
+    <div class="section-title">
+        <h2>Contact Us</h2>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-5 mb-5">
+            <div class="contact-info-card">
+                <h3>Get In Touch</h3>
+                <p class="mb-5">We'd love to hear from you. Please fill out the form or reach us using the contact details.</p>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h5>Location</h5>
+                        <p>Guriceel</p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-telephone"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h5>Phone</h5>
+                        <p>615015937</p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h5>Email</h5>
+                        <p>munasar774@gmail.com</p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h5>Opening Hours</h5>
+                        <p>Mon-Fri: 9am - 10pm<br>Sat-Sun: 10am - 11pm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-7">
+            <form class="p-4 bg-white rounded shadow-sm border">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Your Name</label>
+                        <input type="text" class="form-control" placeholder="Name">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Your Email</label>
+                        <input type="email" class="form-control" placeholder="Email">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text" class="form-control" placeholder="Subject">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-control" rows="5" placeholder="Your Message"></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger w-100">Send Message</button>
+            </form>
+        </div>
+    </div>
+</div>

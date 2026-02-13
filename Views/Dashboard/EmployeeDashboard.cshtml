@@ -1,0 +1,352 @@
+@model RestaurantManagement.ViewModels.EmployeeDashboardViewModel
+@{
+    ViewData["Title"] = "Employee Dashboard";
+}
+
+@functions {
+    public string GetStatusGradient(RestaurantManagement.Models.OrderStatus status)
+    {
+        return status switch
+        {
+            RestaurantManagement.Models.OrderStatus.Pending => "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+            RestaurantManagement.Models.OrderStatus.Preparing => "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            RestaurantManagement.Models.OrderStatus.Ready => "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
+            RestaurantManagement.Models.OrderStatus.Delivered => "linear-gradient(135deg, #13547a 0%, #80d0c7 100%)",
+            _ => "linear-gradient(135deg, #6c757d 0%, #adb5bd 100%)"
+        };
+    }
+}
+
+<style>
+    /* Dashboard Specific Styles */
+    .dashboard-header {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(48, 207, 208, 0.3);
+    }
+
+    .dashboard-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 800;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .order-card {
+        transition: all 0.3s;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        background: white;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .order-header {
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .order-header.pending { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+    .order-header.preparing { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .order-header.ready { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; }
+    .order-header.delivered { background: linear-gradient(135deg, #13547a 0%, #80d0c7 100%); color: white; }
+
+    .order-body {
+        padding: 20px;
+        flex-grow: 1;
+    }
+
+    .order-footer {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .table-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        backdrop-filter: blur(5px);
+    }
+
+    .item-list {
+        margin: 0;
+        padding-left: 20px;
+        margin-bottom: 15px;
+        color: #555;
+    }
+
+    .table-availability-card {
+        background: white;
+        border-radius: 15px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .table-availability-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .table-availability-card.available {
+        border-color: #10b981;
+    }
+    .table-availability-card.available .table-icon { color: #10b981; }
+
+    .table-availability-card.occupied {
+        border-color: #ef4444;
+        background: #fff5f5;
+        opacity: 0.7;
+    }
+    .table-availability-card.occupied .table-icon { color: #ef4444; }
+
+    .table-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    
+    .quick-action-btn-emp {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        margin-bottom: 10px;
+    }
+    
+    .quick-action-btn-emp:hover {
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+</style>
+
+<!-- Dashboard Header -->
+<div class="dashboard-header fade-in-up">
+    <h1><i class="bi bi-speedometer2"></i> Workspace</h1>
+    <div class="date">@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</div>
+</div>
+
+<div class="row g-4 mb-4">
+        <!-- My Orders -->
+        <div class="col-md-3">
+            <div class="stat-card-employee stat-blue">
+                <div class="icon-circle">
+                    <i class="bi bi-basket"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.ActiveOrders.Count</div>
+                    <div class="stat-label">My Orders / Dalabaadkayga</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="col-md-3">
+            <div class="stat-card-employee stat-orange">
+                <div class="icon-circle">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.PendingOrders</div>
+                    <div class="stat-label">Pending / Sugaya</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ready -->
+        <div class="col-md-3">
+            <div class="stat-card-employee stat-green">
+                <div class="icon-circle">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.ReadyOrders</div>
+                    <div class="stat-label">Ready / Diyaar</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Button -->
+        <div class="col-md-3">
+            <a href="@Url.Action("Create", "Order")" class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 15px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);">
+                <i class="bi bi-plus-circle-fill fs-4"></i> New Order / Dalab Cusub
+            </a>
+        </div>
+    </div>
+
+    <!-- Active Orders Grid -->
+    <h4 class="mb-4 fw-bold text-dark"><i class="bi bi-activity me-2"></i> Active Orders / Dalabaadka Socda</h4>
+    
+    <div class="row g-4">
+        @if (Model.ActiveOrders.Any())
+        {
+            foreach (var order in Model.ActiveOrders)
+            {
+                <div class="col-md-6 col-xl-4">
+                    <div class="order-card p-0">
+                        <!-- Card Header with Gradient Status -->
+                        <div class="p-3 text-white d-flex justify-content-between align-items-center" 
+                             style="background: @GetStatusGradient(order.Status);">
+                            <h5 class="mb-0 fw-bold">Table @order.Table?.TableNumber</h5>
+                            <span class="badge bg-white text-dark rounded-pill px-3">#@order.Id</span>
+                        </div>
+                        
+                        <div class="p-3">
+                            <!-- Order Items -->
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-2">ITEMS / ALAABTA:</small>
+                                @foreach(var item in order.OrderItems)
+                                {
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-medium">@item.Quantity x @item.MenuItem?.Name</span>
+                                        <span>$@item.UnitPrice.ToString("N2")</span>
+                                    </div>
+                                }
+                                <hr class="my-2" style="opacity: 0.1">
+                                <div class="d-flex justify-content-between fw-bold">
+                                    <span>TOTAL / WADARTA</span>
+                                    <span class="text-primary">$@order.TotalAmount.ToString("N2")</span>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2">
+                                @if (order.Status == RestaurantManagement.Models.OrderStatus.Ready)
+                                {
+                                    <form asp-action="UpdateStatus" asp-controller="Order" method="post">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="Delivered" />
+                                        <button type="submit" class="btn btn-success w-100 fw-bold text-white">
+                                            <i class="bi bi-check2-circle"></i> Mark Delivered / Gaarsii
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-light w-100 text-muted" disabled>
+                                        <i class="bi bi-hourglass-split"></i> In Progress / Wuu Socdaa...
+                                    </button>
+                                }
+                                <a href="@Url.Action("Details", "Order", new { id = order.Id })" class="btn btn-outline-primary w-100">
+                                    View Details / Faahfaahin
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <div class="text-muted opacity-50 display-1 mb-3"><i class="bi bi-clipboard-check"></i></div>
+                <h3>No Active Orders / Dalabaad Ma Jiraan</h3>
+                <p class="text-muted">You're all caught up! Ready to take a new order? / Diyaar ma u tahay dalab cusub?</p>
+            </div>
+        }
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="col-lg-4">
+        <!-- Tables -->
+        <div class="card fade-in-up mb-4">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold m-0"><i class="bi bi-grid-3x3-gap"></i> Available Tables</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-2">
+                    @foreach (var table in Model.AvailableTables)
+                    {
+                        <div class="col-4">
+                            <div class="table-availability-card available">
+                                <div class="table-icon"><i class="bi bi-check-circle-fill"></i></div>
+                                <div class="fw-bold">@table.TableNumber</div>
+                                <small class="text-muted">@table.Capacity <i class="bi bi-people-fill"></i></small>
+                            </div>
+                        </div>
+                    }
+                     @if (!Model.AvailableTables.Any())
+                    {
+                        <div class="col-12 text-center text-muted">All tables occupied</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card fade-in-up">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold m-0"><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body p-4">
+                <a href="@Url.Action("Create", "Order")" class="quick-action-btn-emp">
+                    <i class="bi bi-plus-circle"></i> New Order
+                </a>
+                <a href="@Url.Action("Index", "Order")" class="quick-action-btn-emp" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="bi bi-list"></i> All Orders
+                </a>
+                <a href="@Url.Action("Index", "Table")" class="quick-action-btn-emp" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <i class="bi bi-grid-3x3"></i> Manage Tables
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateStatus(orderId, newStatus) {
+            // Add loading effect to button
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+            btn.disabled = true;
+
+            fetch('@Url.Action("UpdateStatus", "Kitchen")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `id=${orderId}&status=${newStatus}`
+            }).then(res => {
+                if (res.ok) {
+                    // Success animation or flush
+                    window.location.reload();
+                } else {
+                    alert('Failed to update status. Please try again.');
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            }).catch(err => {
+                console.error('Error:', err);
+                alert('An error occurred.');
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            });
+        }
+    </script>
+}

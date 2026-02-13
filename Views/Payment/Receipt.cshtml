@@ -1,0 +1,73 @@
+@model RestaurantManagement.Models.Order
+@{
+    ViewData["Title"] = "Receipt";
+}
+
+<div class="container py-4">
+    <div class="receipt">
+        <div class="receipt-header">
+            <h3><i class="bi bi-shop"></i> Restaurant</h3>
+            <p class="text-muted mb-0">Order Receipt</p>
+        </div>
+        
+        <div class="mb-3">
+            <div class="d-flex justify-content-between">
+                <span>Order #:</span>
+                <strong>@Model.Id</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Table:</span>
+                <strong>@Model.Table?.TableNumber</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Date:</span>
+                <strong>@Model.Payment?.PaymentDate.ToString("MMM dd, yyyy HH:mm")</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Served by:</span>
+                <strong>@Model.User?.FullName</strong>
+            </div>
+        </div>
+        
+        <hr />
+        
+        <div class="receipt-items">
+            @foreach (var item in Model.OrderItems)
+            {
+                <div class="receipt-item">
+                    <div>
+                        <span>@item.MenuItem?.Name</span>
+                        <br />
+                        <small class="text-muted">$@item.UnitPrice.ToString("N2") × @item.Quantity</small>
+                    </div>
+                    <span>$@item.Subtotal.ToString("N2")</span>
+                </div>
+            }
+        </div>
+        
+        <div class="receipt-total">
+            <span>TOTAL</span>
+            <span>$@Model.TotalAmount.ToString("N2")</span>
+        </div>
+        
+        <div class="mb-3">
+            <div class="d-flex justify-content-between">
+                <span>Payment Method:</span>
+                <span class="badge bg-primary">@Model.Payment?.PaymentMethod</span>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <p class="mb-0">Thank you for dining with us!</p>
+        </div>
+        
+        <div class="text-center mt-4 d-print-none">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="bi bi-printer"></i> Print Receipt
+            </button>
+            <a href="@Url.Action("Index", "Order")" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Orders
+            </a>
+        </div>
+    </div>
+</div>

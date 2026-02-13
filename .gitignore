@@ -1,0 +1,26 @@
+# Visual Studio
+.vs/
+.vscode/
+
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Executables
+*.exe
+*.dll
+*.pdb
+*.manifest
+
+# OS generated
+Thumbs.db
+Desktop.ini
+
+# App Settings
+appsettings.Production.json
+appsettings.Development.json

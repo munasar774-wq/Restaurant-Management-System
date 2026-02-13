@@ -1,0 +1,229 @@
+@model RestaurantManagement.Models.Order
+@using RestaurantManagement.Models
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-receipt"></i> Order #@Model.Id</h1>
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Orders
+        </a>
+    </div>
+</div>
+
+<!-- Status Flow -->
+<div class="status-flow">
+    <div class="status-step @(Model.Status >= OrderStatus.Pending && Model.Status != OrderStatus.Cancelled ? (Model.Status > OrderStatus.Pending ? "completed" : "active") : "")">
+        <div class="status-icon"><i class="bi bi-hourglass"></i></div>
+        <div class="status-label">Pending</div>
+    </div>
+    <div class="status-step @(Model.Status >= OrderStatus.Preparing && Model.Status != OrderStatus.Cancelled ? (Model.Status > OrderStatus.Preparing ? "completed" : "active") : "")">
+        <div class="status-icon"><i class="bi bi-fire"></i></div>
+        <div class="status-label">Preparing</div>
+    </div>
+    <div class="status-step @(Model.Status >= OrderStatus.Ready && Model.Status != OrderStatus.Cancelled ? (Model.Status > OrderStatus.Ready ? "completed" : "active") : "")">
+        <div class="status-icon"><i class="bi bi-check-circle"></i></div>
+        <div class="status-label">Ready</div>
+    </div>
+    <div class="status-step @(Model.Status == OrderStatus.Delivered ? "completed" : "")">
+        <div class="status-icon"><i class="bi bi-truck"></i></div>
+        <div class="status-label">Delivered</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Order Items -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-list"></i> Order Items</span>
+                @if (Model.Status == OrderStatus.Pending || Model.Status == OrderStatus.Preparing)
+                {
+                    <a href="@Url.Action("AddItems", new { id = Model.Id })" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus"></i> Add Items
+                    </a>
+                }
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table order-items-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th>Subtotal</th>
+                                @if (Model.Status == OrderStatus.Pending || Model.Status == OrderStatus.Preparing)
+                                {
+                                    <th></th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="item-name">@item.MenuItem?.Name</span>
+                                        @if (!string.IsNullOrEmpty(item.SpecialInstructions))
+                                        {
+                                            <br /><span class="item-instructions">@item.SpecialInstructions</span>
+                                        }
+                                    </td>
+                                    <td>$@item.UnitPrice.ToString("N2")</td>
+                                    <td>@item.Quantity</td>
+                                    <td><strong>$@item.Subtotal.ToString("N2")</strong></td>
+                                    @if (Model.Status == OrderStatus.Pending || Model.Status == OrderStatus.Preparing)
+                                    {
+                                        <td>
+                                            <form asp-action="RemoveItem" method="post" class="d-inline">
+                                                <input type="hidden" name="orderItemId" value="@item.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Total:</th>
+                                <th class="text-primary">$@Model.TotalAmount.ToString("N2")</th>
+                                @if (Model.Status == OrderStatus.Pending || Model.Status == OrderStatus.Preparing)
+                                {
+                                    <th></th>
+                                }
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        @if (!string.IsNullOrEmpty(Model.Notes))
+        {
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-sticky"></i> Notes
+                </div>
+                <div class="card-body">
+                    @Model.Notes
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Order Info -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Order Details
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-6">Order #</dt>
+                    <dd class="col-6">@Model.Id</dd>
+                    
+                    <dt class="col-6">Table</dt>
+                    <dd class="col-6">Table @Model.Table?.TableNumber</dd>
+                    
+                    <dt class="col-6">Created By</dt>
+                    <dd class="col-6">@Model.User?.FullName</dd>
+                    
+                    <dt class="col-6">Date</dt>
+                    <dd class="col-6">@Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</dd>
+                    
+                    <dt class="col-6">Status</dt>
+                    <dd class="col-6">
+                        <span class="badge-status badge-@Model.Status.ToString().ToLower()">@Model.Status</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        @if (Model.Status != OrderStatus.Delivered && Model.Status != OrderStatus.Cancelled)
+        {
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-gear"></i> Actions
+                </div>
+                <div class="card-body d-grid gap-2">
+                    @if (Model.Status == OrderStatus.Pending)
+                    {
+                        <form asp-action="UpdateStatus" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="newStatus" value="@OrderStatus.Preparing" />
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-fire"></i> Start Preparing
+                            </button>
+                        </form>
+                    }
+                    @if (Model.Status == OrderStatus.Preparing)
+                    {
+                        <form asp-action="UpdateStatus" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="newStatus" value="@OrderStatus.Ready" />
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-check-circle"></i> Mark as Ready
+                            </button>
+                        </form>
+                    }
+                    @if (Model.Status == OrderStatus.Ready)
+                    {
+                        @if (Model.Payment == null)
+                        {
+                            <a href="@Url.Action("Process", "Payment", new { orderId = Model.Id })" class="btn btn-success w-100">
+                                <i class="bi bi-cash-stack"></i> Process Payment
+                            </a>
+                        }
+                        <form asp-action="UpdateStatus" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="newStatus" value="@OrderStatus.Delivered" />
+                            <button type="submit" class="btn btn-dark w-100">
+                                <i class="bi bi-truck"></i> Mark as Delivered
+                            </button>
+                        </form>
+                    }
+                    <form asp-action="Cancel" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-outline-danger w-100" 
+                                onclick="return confirm('Are you sure you want to cancel this order?')">
+                            <i class="bi bi-x-circle"></i> Cancel Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+
+        <!-- Payment Info -->
+        @if (Model.Payment != null)
+        {
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-credit-card"></i> Payment
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-6">Amount</dt>
+                        <dd class="col-6 text-success"><strong>$@Model.Payment.Amount.ToString("N2")</strong></dd>
+                        
+                        <dt class="col-6">Method</dt>
+                        <dd class="col-6"><span class="badge bg-primary">@Model.Payment.PaymentMethod</span></dd>
+                        
+                        <dt class="col-6">Date</dt>
+                        <dd class="col-6">@Model.Payment.PaymentDate.ToString("MMM dd, HH:mm")</dd>
+                    </dl>
+                    <a href="@Url.Action("Receipt", "Payment", new { orderId = Model.Id })" class="btn btn-outline-primary w-100 mt-3">
+                        <i class="bi bi-receipt"></i> View Receipt
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

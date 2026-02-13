@@ -1,0 +1,149 @@
+@model IEnumerable<RestaurantManagement.Models.Reservation>
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-calendar-check"></i> Reservations</h1>
+    <p class="text-muted">Manage table bookings.</p>
+</div>
+
+<div class="row">
+    <!-- List of Reservations -->
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <i class="bi bi-list-ul"></i> Upcoming Bookings
+            </div>
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Table</th>
+                                    <th>Guest</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">@item.ReservationDate.ToString("MMM dd")</div>
+                                            <div class="small text-muted">@item.ReservationDate.ToString("hh:mm tt")</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">
+                                                Table @(item.Table?.TableNumber ?? 0)
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div>@item.CustomerName</div>
+                                            <div class="small text-muted">@item.Guests Guests</div>
+                                        </td>
+                                        <td>
+                                            @if (item.Status == RestaurantManagement.Models.ReservationStatus.Confirmed)
+                                            {
+                                                <span class="badge bg-primary">Confirmed</span>
+                                            }
+                                            else if (item.Status == RestaurantManagement.Models.ReservationStatus.Completed)
+                                            {
+                                                <span class="badge bg-success">Completed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@item.Status</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.Status == RestaurantManagement.Models.ReservationStatus.Confirmed)
+                                            {
+                                                <div class="btn-group btn-group-sm">
+                                                    <form asp-action="Complete" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@item.Id" />
+                                                        <button type="submit" class="btn btn-outline-success" title="Mark Arrived">
+                                                            <i class="bi bi-check-lg"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form asp-action="Cancel" method="post" class="d-inline ms-1" onsubmit="return confirm('Cancel this reservation?');">
+                                                        <input type="hidden" name="id" value="@item.Id" />
+                                                        <button type="submit" class="btn btn-outline-danger" title="Cancel">
+                                                            <i class="bi bi-x-lg"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-calendar-x display-4"></i>
+                        <p class="mt-2">No upcoming reservations found.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Reservation Form -->
+    <div class="col-md-4">
+        <div class="card shadow-sm sticky-top" style="top: 20px;">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-plus-circle"></i> New Reservation
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Table</label>
+                        <select name="TableId" class="form-select" asp-items="ViewBag.TableId" required>
+                            <option value="">-- Select Table --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Date & Time</label>
+                        <input name="ReservationDate" class="form-control" type="datetime-local" 
+                               value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input name="CustomerName" class="form-control" placeholder="John Doe" required />
+                    </div>
+
+                     <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input name="CustomerPhone" class="form-control" placeholder="555-0123" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Guests</label>
+                        <input name="Guests" type="number" class="form-control" value="2" min="1" max="20" required />
+                    </div>
+                    
+                    <div class="mb-3">
+                         <label class="form-label">Notes (Optional)</label>
+                         <textarea name="Notes" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-bookmark-check"></i> Book Table
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

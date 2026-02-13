@@ -1,0 +1,69 @@
+@model List<(RestaurantManagement.Models.ApplicationUser User, string Role)>
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-people"></i> Employees</h1>
+    <a href="@Url.Action("Create")" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Add Employee
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.User.FullName</strong></td>
+                            <td>@item.User.Email</td>
+                            <td>
+                                <span class="badge @(item.Role == "Admin" ? "bg-danger" : "bg-primary")">
+                                    @item.Role
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.User.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td>@item.User.CreatedDate.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <a href="@Url.Action("Edit", new { id = item.User.Id })" 
+                                   class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="@Url.Action("AssignRole", new { id = item.User.Id })" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="bi bi-person-gear"></i>
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = item.User.Id })" 
+                                   class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

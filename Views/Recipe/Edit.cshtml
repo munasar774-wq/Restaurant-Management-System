@@ -1,0 +1,106 @@
+@model RestaurantManagement.Models.RecipeIngredient
+@{
+    ViewData["Title"] = "Edit Recipe";
+    var menuItem = ViewBag.MenuItem as RestaurantManagement.Models.MenuItem;
+    var ingredients = ViewBag.Ingredients as List<RestaurantManagement.Models.RecipeIngredient>;
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-pencil-square"></i> Edit Recipe: @menuItem.Name</h1>
+    <a href="@Url.Action("Index")" class="btn btn-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<div class="row">
+    <!-- Current Recipe -->
+    <div class="col-md-7">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-white">
+                <i class="bi bi-list-check"></i> Current Ingredients
+            </div>
+            <div class="card-body">
+                @if (ingredients != null && ingredients.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Ingredient</th>
+                                    <th>Qty Required</th>
+                                    <th>Unit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ingredients)
+                                {
+                                    <tr>
+                                        <td>@item.InventoryItem.Name</td>
+                                        <td>@item.QuantityRequired</td>
+                                        <td>@item.InventoryItem.Unit</td>
+                                        <td>
+                                            <form asp-action="RemoveIngredient" method="post" onsubmit="return confirm('Remove this ingredient?');">
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i> Remove
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-basket display-4"></i>
+                        <p class="mt-2">No ingredients linked yet.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Ingredient -->
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-plus-circle"></i> Add Ingredient
+            </div>
+            <div class="card-body">
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+
+                <form asp-action="AddIngredient" method="post">
+                    <input type="hidden" name="menuItemId" value="@menuItem.Id" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Ingredient</label>
+                        <select name="inventoryItemId" class="form-select" asp-items="ViewBag.InventoryItems" required>
+                            <option value="">-- Select Ingredient --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Quantity Required</label>
+                        <input type="number" name="quantity" class="form-control" step="0.001" min="0.001" placeholder="e.g. 0.5" required />
+                        <div class="form-text">Amount to deduct per order</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-save"></i> Add to Recipe
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

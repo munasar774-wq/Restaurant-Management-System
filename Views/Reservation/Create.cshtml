@@ -1,0 +1,70 @@
+@model RestaurantManagement.Models.Reservation
+@{
+    ViewData["Title"] = "Book a Table";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-calendar-plus"></i> Book a Table</h1>
+    <a href="@Url.Action("Index")" class="btn btn-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Table</label>
+                        <select asp-for="TableId" class="form-select" asp-items="ViewBag.TableId" required>
+                            <option value="">-- Select Table --</option>
+                        </select>
+                        <span asp-validation-for="TableId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Date & Time</label>
+                        <input asp-for="ReservationDate" class="form-control" type="datetime-local" 
+                               value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                        <span asp-validation-for="ReservationDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input asp-for="CustomerName" class="form-control" placeholder="John Doe" required />
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+
+                     <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input asp-for="CustomerPhone" class="form-control" placeholder="555-0123" required />
+                        <span asp-validation-for="CustomerPhone" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Guests</label>
+                        <input asp-for="Guests" type="number" class="form-control" value="2" min="1" max="20" required />
+                        <span asp-validation-for="Guests" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3">
+                         <label class="form-label">Notes (Optional)</label>
+                         <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                         <span asp-validation-for="Notes" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-circle"></i> Confirm Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

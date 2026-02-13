@@ -1,0 +1,164 @@
+@model RestaurantManagement.ViewModels.DailyReportViewModel
+@{
+    ViewData["Title"] = "Daily Report";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-calendar-day"></i> Daily Report</h1>
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+        <form class="d-flex gap-2">
+            <input type="date" name="date" class="form-control" value="@Model.Date.ToString("yyyy-MM-dd")" />
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row">
+    <div class="col-md-3 col-6">
+        <div class="stat-card blue">
+            <div class="stat-value">@Model.TotalOrders</div>
+            <div class="stat-label">Total Orders</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card dark">
+            <div class="stat-value">@Model.CompletedOrders</div>
+            <div class="stat-label">Completed</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card red">
+            <div class="stat-value">@Model.CancelledOrders</div>
+            <div class="stat-label">Cancelled</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card yellow">
+            <div class="stat-value">$@Model.TotalRevenue.ToString("N0")</div>
+            <div class="stat-label">Revenue</div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Charts -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white">
+                <i class="bi bi-pie-chart-fill text-primary"></i> Payment Analysis
+            </div>
+            <div class="card-body">
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white">
+                <i class="bi bi-bar-chart-fill text-warning"></i> Top Selling Items (Qty)
+            </div>
+            <div class="card-body">
+                <canvas id="topItemsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Orders Table -->
+<div class="card mt-3">
+    <div class="card-header">
+        <i class="bi bi-list"></i> Orders on @Model.Date.ToString("MMMM dd, yyyy")
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Table</th>
+                        <th>Employee</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr>
+                            <td><strong>#@order.OrderId</strong></td>
+                            <td>Table @order.TableNumber</td>
+                            <td>@order.EmployeeName</td>
+                            <td>$@order.Total.ToString("N2")</td>
+                            <td><span class="badge-status badge-@order.Status.ToLower()">@order.Status</span></td>
+                            <td><span class="badge bg-secondary">@order.PaymentMethod</span></td>
+                        </tr>
+                    }
+                    @if (!Model.Orders.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No orders on this date</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Payment Chart
+        const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+        new Chart(paymentCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Cash', 'Card'],
+                datasets: [{
+                    data: [@Model.CashPayments, @Model.CardPayments],
+                    backgroundColor: ['#28a745', '#007bff']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: { display: false }
+                }
+            }
+        });
+
+        // Top Items Chart
+        const topItemsCtx = document.getElementById('topItemsChart').getContext('2d');
+        new Chart(topItemsCtx, {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.TopSellingItems.Select(x => $"'{x.ItemName}'")))],
+                datasets: [{
+                    label: 'Quantity Sold',
+                    data: [@string.Join(",", Model.TopSellingItems.Select(x => x.QuantitySold))],
+                    backgroundColor: '#fd7e14'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}

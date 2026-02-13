@@ -1,0 +1,89 @@
+@model List<RestaurantManagement.Models.Table>
+@{
+    ViewData["Title"] = "Tables";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-grid-3x3"></i> Tables</h1>
+    @if (User.IsInRole("Admin"))
+    {
+        <a href="@Url.Action("Create")" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Table
+        </a>
+    }
+</div>
+
+<div class="row">
+    @foreach (var table in Model)
+    {
+        <div class="col-lg-2 col-md-3 col-4 mb-3">
+            <div class="table-card @(table.IsOccupied ? "occupied" : "available")">
+                <div class="table-number">@table.TableNumber</div>
+                <div class="table-capacity">
+                    <i class="bi bi-person"></i> @table.Capacity seats
+                </div>
+                <div class="mt-2">
+                    @if (table.IsOccupied)
+                    {
+                        <span class="badge bg-danger">Occupied</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                </div>
+                
+                <div class="mt-2 d-flex gap-1 justify-content-center flex-wrap">
+                    @if (!table.IsOccupied)
+                    {
+                        <a href="@Url.Action("Create", "Reservation", new { tableId = table.Id })" class="btn btn-sm btn-outline-info" title="Book Table">
+                            <i class="bi bi-calendar-plus"></i>
+                        </a>
+                    }
+                    
+                    <form asp-action="ToggleOccupancy" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@table.Id" />
+                        <button type="submit" class="btn btn-sm @(table.IsOccupied ? "btn-outline-success" : "btn-outline-warning")" title="@(table.IsOccupied ? "Free table" : "Mark occupied")">
+                            <i class="bi @(table.IsOccupied ? "bi-check" : "bi-x")"></i>
+                        </button>
+                    </form>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a href="@Url.Action("Edit", new { id = table.Id })" class="btn btn-sm btn-outline-primary" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="@Url.Action("Delete", new { id = table.Id })" class="btn btn-sm btn-outline-danger" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.Any())
+    {
+        <div class="col-12">
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-grid-3x3" style="font-size: 4rem;"></i>
+                <p class="mt-3">No tables found</p>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a href="@Url.Action("Create")" class="btn btn-primary">Add First Table</a>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Legend -->
+<div class="card mt-3">
+    <div class="card-body py-2">
+        <div class="d-flex gap-4">
+            <div><span class="badge bg-success">●</span> Available</div>
+            <div><span class="badge bg-danger">●</span> Occupied</div>
+        </div>
+
+    </div>
+</div>
+    </div>
+</div>

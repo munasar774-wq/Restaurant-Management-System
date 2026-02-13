@@ -1,0 +1,93 @@
+@model List<RestaurantManagement.Models.MenuItem>
+@{
+    ViewData["Title"] = "Menu Items";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-menu-button-wide"></i> Menu Items</h1>
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Categories")" class="btn btn-outline-primary">
+            <i class="bi bi-tags"></i> Categories
+        </a>
+        <a href="@Url.Action("Create")" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Item
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.Name" class="rounded" style="width: 60px; height: 60px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <strong>@item.Name</strong>
+                                @if (!string.IsNullOrEmpty(item.Description))
+                                {
+                                    <br /><small class="text-muted">@item.Description</small>
+                                }
+                            </td>
+                            <td><span class="badge bg-secondary">@item.Category?.Name</span></td>
+                            <td><strong class="text-primary">$@item.Price.ToString("N2")</strong></td>
+                            <td>
+                                @if (item.IsAvailable)
+                                {
+                                    <span class="badge bg-success">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Unavailable</span>
+                                }
+                            </td>
+                            <td>
+                                <form asp-action="ToggleAvailability" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn btn-sm @(item.IsAvailable ? "btn-outline-warning" : "btn-outline-success")">
+                                        <i class="bi @(item.IsAvailable ? "bi-pause" : "bi-play")"></i>
+                                    </button>
+                                </form>
+                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No menu items found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

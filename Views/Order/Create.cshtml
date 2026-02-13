@@ -1,0 +1,232 @@
+@model RestaurantManagement.ViewModels.CreateOrderViewModel
+@{
+    ViewData["Title"] = "Create Order";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-plus-circle"></i> Create New Order</h1>
+</div>
+
+<div class="row">
+    <!-- Order Form -->
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="bi bi-grid-3x3"></i> Select Table
+            </div>
+            <div class="card-body">
+                <div class="row g-3" id="tableSelection">
+                    @foreach (var table in Model.AvailableTables)
+                    {
+                        <div class="col-md-3 col-6">
+                            <div class="table-card available" data-table-id="@table.Id" onclick="selectTable(@table.Id, @table.TableNumber)">
+                                <div class="table-number">@table.TableNumber</div>
+                                <div class="table-capacity"><i class="bi bi-person"></i> @table.Capacity</div>
+                            </div>
+                        </div>
+                    }
+                    @if (!Model.AvailableTables.Any())
+                    {
+                        <div class="col-12 text-center text-muted py-3">
+                            No tables available
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-menu-button-wide"></i> Menu Items</span>
+                <div>
+                    <select class="form-select form-select-sm" id="categoryFilter" onchange="filterByCategory()">
+                        <option value="">All Categories</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3" id="menuItems">
+                    @foreach (var item in Model.MenuItems)
+                    {
+                        <div class="col-md-4 col-6 menu-item-wrapper" data-category="@item.CategoryId">
+                            <div class="card menu-item-card h-100" onclick="addItem(@item.Id, '@item.Name.Replace("'", "\\'")', @item.Price)">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name" style="height: 120px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 120px;">
+                                        <i class="bi bi-cup-straw text-muted" style="font-size: 2rem;"></i>
+                                    </div>
+                                }
+                                <div class="card-body text-center p-2">
+                                    <h6 class="card-title mb-1 text-truncate" title="@item.Name">@item.Name</h6>
+                                    <div class="text-primary fw-bold">$@item.Price.ToString("N2")</div>
+                                    <small class="text-muted">@item.Category?.Name</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-lg-4">
+        <div class="card sticky-top" style="top: 80px;">
+            <div class="card-header">
+                <i class="bi bi-cart"></i> Order Summary
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Table: </strong>
+                    <span id="selectedTable" class="badge bg-secondary">Not selected</span>
+                </div>
+
+                <div id="orderItems" class="mb-3">
+                    <p class="text-muted text-center">No items added</p>
+                </div>
+
+                <hr />
+
+                <div class="d-flex justify-content-between mb-3">
+                    <strong>Total:</strong>
+                    <strong class="text-primary" id="orderTotal">$0.00</strong>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Notes (Optional)</label>
+                    <textarea class="form-control" id="orderNotes" rows="2" placeholder="Special instructions..."></textarea>
+                </div>
+
+                <form id="orderForm" asp-action="Create" method="post">
+                    <input type="hidden" name="tableId" id="tableIdInput" />
+                    <input type="hidden" name="notes" id="notesInput" />
+                    <input type="hidden" name="orderItemsJson" id="orderItemsInput" />
+                    
+                    <button type="submit" class="btn btn-primary w-100" id="submitOrder" disabled>
+                        <i class="bi bi-check-lg"></i> Place Order
+                    </button>
+                </form>
+
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary w-100 mt-2">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedTableId = null;
+        let orderItems = [];
+
+        function selectTable(tableId, tableNumber) {
+            // Remove previous selection
+            document.querySelectorAll('.table-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Select new table
+            document.querySelector(`[data-table-id="${tableId}"]`).classList.add('selected');
+            selectedTableId = tableId;
+            document.getElementById('selectedTable').textContent = 'Table ' + tableNumber;
+            document.getElementById('selectedTable').className = 'badge bg-success';
+            document.getElementById('tableIdInput').value = tableId;
+            updateSubmitButton();
+        }
+
+        function addItem(menuItemId, name, price) {
+            // Check if item already exists
+            const existingItem = orderItems.find(i => i.MenuItemId === menuItemId);
+            if (existingItem) {
+                existingItem.Quantity++;
+            } else {
+                orderItems.push({
+                    MenuItemId: menuItemId,
+                    MenuItemName: name,
+                    Quantity: 1,
+                    UnitPrice: price
+                });
+            }
+            renderOrderItems();
+        }
+
+        function removeItem(menuItemId) {
+            const index = orderItems.findIndex(i => i.MenuItemId === menuItemId);
+            if (index > -1) {
+                if (orderItems[index].Quantity > 1) {
+                    orderItems[index].Quantity--;
+                } else {
+                    orderItems.splice(index, 1);
+                }
+            }
+            renderOrderItems();
+        }
+
+        function renderOrderItems() {
+            const container = document.getElementById('orderItems');
+            if (orderItems.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No items added</p>';
+                document.getElementById('orderTotal').textContent = '$0.00';
+                updateSubmitButton();
+                return;
+            }
+
+            let html = '<div class="list-group">';
+            let total = 0;
+
+            orderItems.forEach(item => {
+                const subtotal = item.Quantity * item.UnitPrice;
+                total += subtotal;
+                html += `
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${item.MenuItemName}</strong><br>
+                            <small class="text-muted">$${item.UnitPrice.toFixed(2)} × ${item.Quantity}</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-primary">$${subtotal.toFixed(2)}</span>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItem(${item.MenuItemId})">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+            document.getElementById('orderTotal').textContent = '$' + total.toFixed(2);
+            updateSubmitButton();
+        }
+
+        function updateSubmitButton() {
+            const btn = document.getElementById('submitOrder');
+            btn.disabled = !selectedTableId || orderItems.length === 0;
+        }
+
+        function filterByCategory() {
+            const categoryId = document.getElementById('categoryFilter').value;
+            document.querySelectorAll('.menu-item-wrapper').forEach(wrapper => {
+                if (!categoryId || wrapper.dataset.category === categoryId) {
+                    wrapper.style.display = '';
+                } else {
+                    wrapper.style.display = 'none';
+                }
+            });
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            document.getElementById('notesInput').value = document.getElementById('orderNotes').value;
+            document.getElementById('orderItemsInput').value = JSON.stringify(orderItems);
+        });
+    </script>
+}

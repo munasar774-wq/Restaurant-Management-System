@@ -1,0 +1,60 @@
+@model IEnumerable<RestaurantManagement.Models.MenuItem>
+@{
+    ViewData["Title"] = "Recipe Management";
+    var recipeCounts = ViewBag.RecipeCounts as Dictionary<int, int>;
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-journal-album"></i> Recipe Management</h1>
+    <p class="text-muted">Manage ingredients and stock deduction for menu items.</p>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Menu Item</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Ingredients</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var count = recipeCounts != null && recipeCounts.ContainsKey(item.Id) ? recipeCounts[item.Id] : 0;
+                        <tr>
+                            <td>
+                                <div class="fw-bold">@item.Name</div>
+                                @if (!item.IsAvailable)
+                                {
+                                    <span class="badge bg-secondary">Unavailable</span>
+                                }
+                            </td>
+                            <td><span class="badge bg-info text-dark">@item.Category.Name</span></td>
+                            <td>$@item.Price.ToString("N2")</td>
+                            <td>
+                                @if (count > 0)
+                                {
+                                    <span class="badge bg-success">@count Ingredients Linked</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">No Recipe</span>
+                                }
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Manage Recipe
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

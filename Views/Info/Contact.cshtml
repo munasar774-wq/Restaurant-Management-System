@@ -1,0 +1,113 @@
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-telephone"></i> Contact Us</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-geo-alt"></i> Contact Information
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stat-card blue me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 0;">
+                            <i class="bi bi-telephone-fill" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Phone</h5>
+                            <p class="mb-0 text-muted">615015937</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stat-card red me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 0;">
+                            <i class="bi bi-envelope-fill" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Email</h5>
+                            <p class="mb-0 text-muted">munasar774@gmail.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="stat-card yellow me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 0;">
+                            <i class="bi bi-clock-fill" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Business Hours</h5>
+                            <p class="mb-0 text-muted">Mon - Sun: 8:00 AM - 10:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr />
+                
+                <h5><i class="bi bi-chat-quote"></i> We'd Love to Hear From You</h5>
+                <p class="text-muted">
+                    Have questions about our restaurant management system? Want to learn more about 
+                    our services? Feel free to reach out to us anytime!
+                </p>
+                
+                <div class="d-grid gap-2 mt-4">
+                    <a href="tel:615015937" class="btn btn-primary">
+                        <i class="bi bi-telephone"></i> Call Now: 615015937
+                    </a>
+                    <a href="mailto:munasar774@gmail.com" class="btn btn-danger">
+                        <i class="bi bi-envelope"></i> Email: munasar774@gmail.com
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-send"></i> Send Us a Message
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Your Name</label>
+                        <input type="text" class="form-control" placeholder="Enter your name" />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" placeholder="Enter your email" />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" placeholder="Enter your phone number" />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <select class="form-select">
+                            <option value="">Select a subject</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="business">Business Partnership</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" rows="4" placeholder="Type your message here..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-send"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,127 @@
+@model RestaurantManagement.ViewModels.PaymentViewModel
+@{
+    ViewData["Title"] = "Process Payment";
+    var order = ViewBag.Order as RestaurantManagement.Models.Order;
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-cash-stack"></i> Process Payment</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-receipt"></i> Order #@Model.OrderId Summary
+            </div>
+            <div class="card-body">
+                @if (order != null)
+                {
+                    <table class="table table-sm">
+                        <tbody>
+                            @foreach (var item in order.OrderItems)
+                            {
+                                <tr>
+                                    <td>@item.MenuItem?.Name × @item.Quantity</td>
+                                    <td class="text-end">$@item.Subtotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-primary">
+                                <th>Total</th>
+                                <th class="text-end">$@Model.OrderTotal.ToString("N2")</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-credit-card"></i> Payment Details
+            </div>
+            <div class="card-body">
+                <form asp-action="Process" method="post">
+                    <input type="hidden" asp-for="OrderId" />
+                    <input type="hidden" asp-for="OrderTotal" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="PaymentMethod" class="form-label"></label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="0" id="cashOption" checked />
+                                <label class="form-check-label" for="cashOption">
+                                    <i class="bi bi-cash"></i> Cash
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="1" id="cardOption" />
+                                <label class="form-check-label" for="cardOption">
+                                    <i class="bi bi-credit-card"></i> Card
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="2" id="evcOption" />
+                                <label class="form-check-label" for="evcOption">
+                                    <i class="bi bi-phone"></i> EVC Plus
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="3" id="edahabOption" />
+                                <label class="form-check-label" for="edahabOption">
+                                    <i class="bi bi-phone"></i> Edahab
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="AmountReceived" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="AmountReceived" class="form-control" id="amountReceived" oninput="calculateChange()" />
+                        </div>
+                        <span asp-validation-for="AmountReceived" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Change</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" id="changeAmount" readonly value="0.00" />
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-lg"></i> Complete Payment
+                        </button>
+                        <a href="@Url.Action("Details", "Order", new { id = Model.OrderId })" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const orderTotal = @Model.OrderTotal;
+        
+        function calculateChange() {
+            const received = parseFloat(document.getElementById('amountReceived').value) || 0;
+            const change = received - orderTotal;
+            document.getElementById('changeAmount').value = (change >= 0 ? change : 0).toFixed(2);
+        }
+        
+        // Calculate on load
+        calculateChange();
+    </script>
+}
