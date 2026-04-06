@@ -25,61 +25,21 @@
             overflow-x: hidden;
         }
 
-        /* Animated Gradient Background */
+        /* Static Background */
         .login-container {
-            height: 100vh; /* Changed from min-height to height */
+            height: 100vh;
             width: 100vw;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: fixed; /* Fixed position to prevent scroll */
+            position: fixed;
             top: 0;
             left: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            overflow: hidden; /* Hide any overflow */
-        }
-
-        @@keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Floating Particles Background */
-        .particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+            background: linear-gradient(135deg, #1d42e9 0%, #29d93e 50%, #4facfe 100%);
             overflow: hidden;
         }
 
-        .particle {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            animation: float 20s infinite;
-        }
 
-        @@keyframes float {
-            0%, 100% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(100px);
-                opacity: 0;
-            }
-        }
 
         /* Glassmorphism Card */
         .glass-card {
@@ -93,18 +53,6 @@
             width: 100%;
             max-width: 450px;
             position: relative;
-            animation: slideIn 0.6s ease-out;
-        }
-
-        @@keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .glass-card::before {
@@ -135,18 +83,6 @@
             border-radius: 50%;
             border: 4px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @@keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-            }
         }
 
         .welcome-text {
@@ -317,45 +253,7 @@
             color: white;
         }
 
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
 
-        .loading-overlay.show {
-            display: flex;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @@keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 1.2rem;
-            margin-top: 20px;
-            position: absolute;
-            bottom: 40%;
-        }
 
         /* Alert Styling */
         .alert {
@@ -383,18 +281,6 @@
 </head>
 <body>
     <div class="login-container">
-        <!-- Animated Particles -->
-        <div class="particles">
-            <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
-            <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
-            <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
-            <div class="particle" style="left: 40%; animation-delay: 6s;"></div>
-            <div class="particle" style="left: 50%; animation-delay: 8s;"></div>
-            <div class="particle" style="left: 60%; animation-delay: 10s;"></div>
-            <div class="particle" style="left: 70%; animation-delay: 12s;"></div>
-            <div class="particle" style="left: 80%; animation-delay: 14s;"></div>
-            <div class="particle" style="left: 90%; animation-delay: 16s;"></div>
-        </div>
 
         <!-- Glassmorphism Login Card -->
         <div class="glass-card">
@@ -404,7 +290,7 @@
                 <p class="subtitle">Login to Nexora Restaurant</p>
             </div>
 
-            <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]" onsubmit="document.querySelector('.loading-overlay').classList.add('show')">
+            <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
                 <div asp-validation-summary="ModelOnly" class="alert" role="alert"></div>
 
                 <!-- Email Input -->
@@ -439,13 +325,7 @@
         </div>
     </div>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay">
-        <div>
-            <div class="spinner"></div>
-            <div class="loading-text">Logging in...</div>
-        </div>
-    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
@@ -462,33 +342,6 @@
             this.classList.toggle('bi-eye');
             this.classList.toggle('bi-eye-slash');
         });
-
-        // Add ripple effect to button
-        document.querySelector('.btn-login').addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            ripple.style.position = 'absolute';
-            ripple.style.borderRadius = '50%';
-            ripple.style.background = 'rgba(255, 255, 255, 0.5)';
-            ripple.style.width = ripple.style.height = '100px';
-            ripple.style.left = e.clientX - this.offsetLeft - 50 + 'px';
-            ripple.style.top = e.clientY - this.offsetTop - 50 + 'px';
-            ripple.style.animation = 'ripple 0.6s linear';
-            this.appendChild(ripple);
-
-            setTimeout(() => ripple.remove(), 600);
-        });
-
-        // Ripple animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @@keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>

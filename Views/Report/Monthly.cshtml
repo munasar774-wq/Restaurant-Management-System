@@ -139,10 +139,10 @@
         new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: [@Html.Raw(string.Join(",", Model.DailySummaries.Select(x => $"'{x.Date:dd}'")))],
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailySummaries.Select(x => x.Date.ToString("dd")))),
                 datasets: [{
                     label: 'Daily Revenue',
-                    data: [@string.Join(",", Model.DailySummaries.Select(x => x.Revenue))],
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailySummaries.Select(x => x.Revenue))),
                     borderColor: '#0d6efd',
                     backgroundColor: 'rgba(13, 110, 253, 0.1)',
                     fill: true,
@@ -166,9 +166,9 @@
         new Chart(topItemsCtx, {
             type: 'doughnut',
             data: {
-                labels: [@Html.Raw(string.Join(",", Model.TopSellingItems.Select(x => $"'{x.ItemName}'")))],
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopSellingItems.Select(x => x.ItemName))),
                 datasets: [{
-                    data: [@string.Join(",", Model.TopSellingItems.Select(x => x.Revenue))],
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopSellingItems.Select(x => x.Revenue))),
                     backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
                 }]
             },
@@ -185,10 +185,10 @@
         new Chart(empCtx, {
             type: 'bar',
             data: {
-                labels: [@Html.Raw(string.Join(",", Model.EmployeePerformances.Select(x => $"'{x.EmployeeName}'")))],
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmployeePerformances.Select(x => x.EmployeeName))),
                 datasets: [{
                     label: 'Total Sales ($)',
-                    data: [@string.Join(",", Model.EmployeePerformances.Select(x => x.TotalSales))],
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmployeePerformances.Select(x => x.TotalSales))),
                     backgroundColor: '#198754'
                 }]
             },

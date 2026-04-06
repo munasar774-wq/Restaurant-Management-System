@@ -124,7 +124,7 @@
             data: {
                 labels: ['Cash', 'Card'],
                 datasets: [{
-                    data: [@Model.CashPayments, @Model.CardPayments],
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new[] { Model.CashPayments, Model.CardPayments })),
                     backgroundColor: ['#28a745', '#007bff']
                 }]
             },
@@ -142,10 +142,10 @@
         new Chart(topItemsCtx, {
             type: 'bar',
             data: {
-                labels: [@Html.Raw(string.Join(",", Model.TopSellingItems.Select(x => $"'{x.ItemName}'")))],
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopSellingItems.Select(x => x.ItemName))),
                 datasets: [{
                     label: 'Quantity Sold',
-                    data: [@string.Join(",", Model.TopSellingItems.Select(x => x.QuantitySold))],
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopSellingItems.Select(x => x.QuantitySold))),
                     backgroundColor: '#fd7e14'
                 }]
             },

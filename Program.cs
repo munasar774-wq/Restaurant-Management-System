@@ -69,7 +69,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Commented out for SmarterASP load balancer compatibility
 app.UseStaticFiles();
 
 app.UseRouting();

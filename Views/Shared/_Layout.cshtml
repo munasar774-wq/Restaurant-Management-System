@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -25,73 +25,73 @@
                 <ul class="list-unstyled components">
                     <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
                         <a href="@Url.Action("Index", "Dashboard")">
-                            <i class="bi bi-speedometer2"></i> Dashboard / Xog-Kooban
+                            <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                     </li>
                     
                     <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Kitchen" ? "active" : "")">
                         <a href="@Url.Action("Index", "Kitchen")">
-                            <i class="bi bi-fire"></i> Kitchen / Jikada
+                            <i class="bi bi-fire"></i> Kitchen
                         </a>
                     </li>
 
                     <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Order" ? "active" : "")">
                         <a href="@Url.Action("Index", "Order")">
-                            <i class="bi bi-receipt"></i> Orders / Dalabaadka
+                            <i class="bi bi-receipt"></i> Orders
                         </a>
                     </li>
                     
                     <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Table" ? "active" : "")">
                         <a href="@Url.Action("Index", "Table")">
-                            <i class="bi bi-grid-3x3"></i> Tables / Miisaska
+                            <i class="bi bi-grid-3x3"></i> Tables
                         </a>
                     </li>
 
                     <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" ? "active" : "")">
                         <a href="@Url.Action("Index", "Reservation")">
-                            <i class="bi bi-calendar-check"></i> Reservations / Boos-Qabsiga
+                            <i class="bi bi-calendar-check"></i> Reservations
                         </a>
                     </li>
                     
                     @if (User.IsInRole("Admin"))
                     {
                         <li class="menu-header">
-                            <span>Administration / Maamulka</span>
+                            <span>Administration</span>
                         </li>
                         
                         <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Menu" ? "active" : "")">
                             <a href="@Url.Action("Index", "Menu")">
-                                <i class="bi bi-menu-button-wide"></i> Menu / Cuntada
+                                <i class="bi bi-menu-button-wide"></i> Menu
                             </a>
                         </li>
                         
                         <li class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Categories" ? "active" : "")">
                             <a href="@Url.Action("Categories", "Menu")">
-                                <i class="bi bi-tags"></i> Categories / Qaybaha
+                                <i class="bi bi-tags"></i> Categories
                             </a>
                         </li>
                         
                         <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Employee" ? "active" : "")">
                             <a href="@Url.Action("Index", "Employee")">
-                                <i class="bi bi-people"></i> Employees / Shaqaalaha
+                                <i class="bi bi-people"></i> Employees
                             </a>
                         </li>
                         
                         <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Inventory" ? "active" : "")">
                             <a href="@Url.Action("Index", "Inventory")">
-                                <i class="bi bi-box-seam"></i> Inventory / Bakhaarka
+                                <i class="bi bi-box-seam"></i> Inventory
                             </a>
                         </li>
 
                         <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Recipe" ? "active" : "")">
                             <a href="@Url.Action("Index", "Recipe")">
-                                <i class="bi bi-journal-album"></i> Recipes / Cunto-Karis
+                                <i class="bi bi-journal-album"></i> Recipes
                             </a>
                         </li>
 
                         <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" ? "active" : "")">
                             <a href="@Url.Action("Index", "Report")">
-                                <i class="bi bi-graph-up"></i> Reports / Warbixino
+                                <i class="bi bi-graph-up"></i> Reports
                             </a>
                         </li>
                     }
@@ -111,16 +111,11 @@
                             <i class="bi bi-list"></i>
                         </button>
 
-                        <!-- Search Bar -->
-                        <div class="header-search-container d-none d-md-block">
-                            <i class="bi bi-search header-search-icon"></i>
-                            <input type="text" class="header-search-input" placeholder="Search / Baar...">
-                        </div>
                         
                         <div class="ms-auto d-flex align-items-center gap-3">
                             <!-- User Type Badge -->
                             <span class="badge bg-white text-primary rounded-pill px-3 py-2 d-none d-sm-inline-block">
-                                @(User.IsInRole("Admin") ? "Admin / Maamule" : "Employee / Shaqaale")
+                                @(User.IsInRole("Admin") ? "Admin" : "Employee")
                             </span>
 
                             <!-- Profile Dropdown -->
@@ -132,13 +127,13 @@
                                     <span class="d-none d-sm-inline">@User.Identity?.Name</span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2" aria-labelledby="profileDropdown">
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> My Profile / Ciwaankayga</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i> Settings / Isku-Aadin</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Profile", "Account")"><i class="bi bi-person me-2"></i> My Profile</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Settings", "Account")"><i class="bi bi-gear me-2"></i> Settings</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form asp-action="Logout" asp-controller="Account" method="post">
                                             <button type="submit" class="dropdown-item text-danger">
-                                                <i class="bi bi-box-arrow-right me-2"></i> Logout / Ka-Bax
+                                                <i class="bi bi-box-arrow-right me-2"></i> Logout
                                             </button>
                                         </form>
                                     </li>

@@ -4,312 +4,480 @@
 }
 
 @functions {
+    public string GetStatusColor(RestaurantManagement.Models.OrderStatus status)
+    {
+        return status switch
+        {
+            RestaurantManagement.Models.OrderStatus.Pending => "#f59e0b",
+            RestaurantManagement.Models.OrderStatus.Preparing => "#6366f1",
+            RestaurantManagement.Models.OrderStatus.Ready => "#22c55e",
+            RestaurantManagement.Models.OrderStatus.Delivered => "#06b6d4",
+            _ => "#94a3b8"
+        };
+    }
+
     public string GetStatusGradient(RestaurantManagement.Models.OrderStatus status)
     {
         return status switch
         {
-            RestaurantManagement.Models.OrderStatus.Pending => "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-            RestaurantManagement.Models.OrderStatus.Preparing => "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            RestaurantManagement.Models.OrderStatus.Ready => "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
-            RestaurantManagement.Models.OrderStatus.Delivered => "linear-gradient(135deg, #13547a 0%, #80d0c7 100%)",
-            _ => "linear-gradient(135deg, #6c757d 0%, #adb5bd 100%)"
+            RestaurantManagement.Models.OrderStatus.Pending => "linear-gradient(135deg, #f59e0b, #f97316)",
+            RestaurantManagement.Models.OrderStatus.Preparing => "linear-gradient(135deg, #6366f1, #8b5cf6)",
+            RestaurantManagement.Models.OrderStatus.Ready => "linear-gradient(135deg, #22c55e, #10b981)",
+            RestaurantManagement.Models.OrderStatus.Delivered => "linear-gradient(135deg, #06b6d4, #0891b2)",
+            _ => "linear-gradient(135deg, #94a3b8, #64748b)"
+        };
+    }
+
+    public string GetStatusBg(RestaurantManagement.Models.OrderStatus status)
+    {
+        return status switch
+        {
+            RestaurantManagement.Models.OrderStatus.Pending => "rgba(245,158,11,0.1)",
+            RestaurantManagement.Models.OrderStatus.Preparing => "rgba(99,102,241,0.1)",
+            RestaurantManagement.Models.OrderStatus.Ready => "rgba(34,197,94,0.1)",
+            RestaurantManagement.Models.OrderStatus.Delivered => "rgba(6,182,212,0.1)",
+            _ => "rgba(148,163,184,0.1)"
         };
     }
 }
 
 <style>
-    /* Dashboard Specific Styles */
-    .dashboard-header {
-        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 15px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(48, 207, 208, 0.3);
-    }
+    /* ═══════════════════ EMPLOYEE DASHBOARD ═══════════════════ */
 
-    .dashboard-header h1 {
-        margin: 0;
-        font-size: 2.5rem;
-        font-weight: 800;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    .order-card {
-        transition: all 0.3s;
-        border: none;
-        border-radius: 15px;
+    .emp-welcome {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        border-radius: 24px;
+        padding: 32px 36px;
+        color: #fff;
+        margin-bottom: 28px;
+        position: relative;
         overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        background: white;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.35);
+    }
+
+    .emp-welcome::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -15%;
+        width: 350px;
+        height: 350px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.2), transparent 70%);
+    }
+
+    .emp-welcome h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0 0 6px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .emp-welcome p {
+        margin: 0;
+        opacity: 0.65;
+        font-size: 0.92rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ── Stat Cards ── */
+    .emp-stat {
+        border-radius: 20px;
+        padding: 24px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        min-height: 110px;
+    }
+
+    .emp-stat:hover {
+        transform: translateY(-5px);
+    }
+
+    .emp-stat .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        backdrop-filter: blur(6px);
+    }
+
+    .emp-stat .stat-val {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .emp-stat .stat-lbl {
+        font-size: 0.82rem;
+        opacity: 0.85;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .es-indigo  { background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35); }
+    .es-amber   { background: linear-gradient(135deg, #f59e0b, #f97316); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3); }
+    .es-emerald { background: linear-gradient(135deg, #22c55e, #10b981); box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3); }
+
+    /* ── New Order Button ── */
+    .new-order-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
         height: 100%;
+        min-height: 110px;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #fff;
+        border: 2px dashed rgba(255,255,255,0.2);
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
+    }
+
+    .new-order-btn:hover {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        color: #fff;
+        transform: translateY(-5px);
+        border-color: rgba(255,255,255,0.4);
+        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.35);
+    }
+
+    /* ── Order Card ── */
+    .active-order-card {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
         display: flex;
         flex-direction: column;
+        height: 100%;
     }
 
-    .order-card:hover {
+    .active-order-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.12);
     }
 
-    .order-header {
-        padding: 15px 20px;
+    .aoc-header {
+        padding: 16px 20px;
+        color: #fff;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
 
-    .order-header.pending { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
-    .order-header.preparing { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-    .order-header.ready { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; }
-    .order-header.delivered { background: linear-gradient(135deg, #13547a 0%, #80d0c7 100%); color: white; }
-
-    .order-body {
-        padding: 20px;
-        flex-grow: 1;
-    }
-
-    .order-footer {
-        padding: 15px 20px;
-        background: #f8f9fa;
-        border-top: 1px solid rgba(0,0,0,0.05);
-    }
-
-    .table-badge {
-        background: rgba(255,255,255,0.2);
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        backdrop-filter: blur(5px);
-    }
-
-    .item-list {
+    .aoc-header h6 {
         margin: 0;
-        padding-left: 20px;
-        margin-bottom: 15px;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .aoc-badge {
+        background: rgba(255,255,255,0.25);
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+    }
+
+    .aoc-body {
+        padding: 20px;
+        flex: 1;
+    }
+
+    .aoc-item-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 0.9rem;
         color: #555;
     }
 
-    .table-availability-card {
-        background: white;
-        border-radius: 15px;
-        padding: 15px;
-        text-align: center;
-        transition: all 0.3s;
-        border: 2px solid transparent;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    .aoc-total-row {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 10px;
+        margin-top: 10px;
+        border-top: 1px solid #f0f0f5;
+        font-weight: 700;
+        font-size: 1rem;
     }
 
-    .table-availability-card:hover {
+    .aoc-total-row .total-val {
+        color: #6366f1;
+    }
+
+    .aoc-actions {
+        padding: 16px 20px;
+        background: #fafbfc;
+        border-top: 1px solid #f0f0f5;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* ── Table Cards ── */
+    .tbl-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px;
+        text-align: center;
+        border: 2px solid #e2e8f0;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .tbl-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     }
 
-    .table-availability-card.available {
-        border-color: #10b981;
+    .tbl-card.avail {
+        border-color: #22c55e;
     }
-    .table-availability-card.available .table-icon { color: #10b981; }
 
-    .table-availability-card.occupied {
-        border-color: #ef4444;
-        background: #fff5f5;
-        opacity: 0.7;
+    .tbl-card .tbl-icon {
+        font-size: 1.8rem;
+        color: #22c55e;
+        margin-bottom: 6px;
     }
-    .table-availability-card.occupied .table-icon { color: #ef4444; }
 
-    .table-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
+    .tbl-card .tbl-num {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #1a1a2e;
     }
-    
-    .quick-action-btn-emp {
-        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 10px;
+
+    .tbl-card .tbl-cap {
+        font-size: 0.78rem;
+        color: #999;
+    }
+
+    /* ── Panel Card ── */
+    .panel-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+        overflow: hidden;
+    }
+
+    .panel-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #f0f0f5;
+    }
+
+    .panel-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+
+    .panel-body {
+        padding: 20px 24px;
+    }
+
+    /* ── Quick Actions ── */
+    .emp-quick-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        color: #fff;
         font-weight: 600;
-        transition: all 0.3s;
-        display: block;
-        text-align: center;
         text-decoration: none;
+        transition: all 0.25s ease;
         margin-bottom: 10px;
     }
-    
-    .quick-action-btn-emp:hover {
-        transform: translateY(-2px);
-        color: white;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+
+    .emp-quick-btn:last-child { margin-bottom: 0; }
+
+    .emp-quick-btn:hover {
+        transform: translateX(4px);
+        color: #fff;
     }
+
+    .eqb-1 { background: linear-gradient(135deg, #0f172a, #334155); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3); }
+    .eqb-2 { background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3); }
+    .eqb-3 { background: linear-gradient(135deg, #f59e0b, #f97316); box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3); }
 </style>
 
-<!-- Dashboard Header -->
-<div class="dashboard-header fade-in-up">
-    <h1><i class="bi bi-speedometer2"></i> Workspace</h1>
-    <div class="date">@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</div>
+<!-- Welcome Banner -->
+<div class="emp-welcome">
+    <h2><i class="bi bi-lightning-charge-fill me-2"></i>Workspace</h2>
+    <p>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
 </div>
 
+<!-- Stat Cards -->
 <div class="row g-4 mb-4">
-        <!-- My Orders -->
-        <div class="col-md-3">
-            <div class="stat-card-employee stat-blue">
-                <div class="icon-circle">
-                    <i class="bi bi-basket"></i>
-                </div>
-                <div>
-                    <div class="stat-value">@Model.ActiveOrders.Count</div>
-                    <div class="stat-label">My Orders / Dalabaadkayga</div>
-                </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="emp-stat es-indigo">
+            <div class="stat-icon"><i class="bi bi-basket-fill"></i></div>
+            <div>
+                <div class="stat-val">@Model.ActiveOrders.Count</div>
+                <div class="stat-lbl">My Orders</div>
             </div>
-        </div>
-
-        <!-- Pending -->
-        <div class="col-md-3">
-            <div class="stat-card-employee stat-orange">
-                <div class="icon-circle">
-                    <i class="bi bi-clock-history"></i>
-                </div>
-                <div>
-                    <div class="stat-value">@Model.PendingOrders</div>
-                    <div class="stat-label">Pending / Sugaya</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ready -->
-        <div class="col-md-3">
-            <div class="stat-card-employee stat-green">
-                <div class="icon-circle">
-                    <i class="bi bi-check-circle"></i>
-                </div>
-                <div>
-                    <div class="stat-value">@Model.ReadyOrders</div>
-                    <div class="stat-label">Ready / Diyaar</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Action Button -->
-        <div class="col-md-3">
-            <a href="@Url.Action("Create", "Order")" class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 15px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);">
-                <i class="bi bi-plus-circle-fill fs-4"></i> New Order / Dalab Cusub
-            </a>
         </div>
     </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="emp-stat es-amber">
+            <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+            <div>
+                <div class="stat-val">@Model.PendingOrders</div>
+                <div class="stat-lbl">Pending</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="emp-stat es-emerald">
+            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div>
+                <div class="stat-val">@Model.ReadyOrders</div>
+                <div class="stat-lbl">Ready</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <a href="@Url.Action("Create", "Order")" class="new-order-btn">
+            <i class="bi bi-plus-circle-fill fs-4"></i> New Order
+        </a>
+    </div>
+</div>
 
-    <!-- Active Orders Grid -->
-    <h4 class="mb-4 fw-bold text-dark"><i class="bi bi-activity me-2"></i> Active Orders / Dalabaadka Socda</h4>
-    
-    <div class="row g-4">
-        @if (Model.ActiveOrders.Any())
+<!-- Active Orders -->
+<h5 class="fw-bold text-dark mb-3"><i class="bi bi-activity me-2"></i>Active Orders</h5>
+
+<div class="row g-4 mb-4">
+    @if (Model.ActiveOrders.Any())
+    {
+        foreach (var order in Model.ActiveOrders)
         {
-            foreach (var order in Model.ActiveOrders)
-            {
-                <div class="col-md-6 col-xl-4">
-                    <div class="order-card p-0">
-                        <!-- Card Header with Gradient Status -->
-                        <div class="p-3 text-white d-flex justify-content-between align-items-center" 
-                             style="background: @GetStatusGradient(order.Status);">
-                            <h5 class="mb-0 fw-bold">Table @order.Table?.TableNumber</h5>
-                            <span class="badge bg-white text-dark rounded-pill px-3">#@order.Id</span>
-                        </div>
-                        
-                        <div class="p-3">
-                            <!-- Order Items -->
-                            <div class="mb-3">
-                                <small class="text-muted d-block mb-2">ITEMS / ALAABTA:</small>
-                                @foreach(var item in order.OrderItems)
-                                {
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span class="fw-medium">@item.Quantity x @item.MenuItem?.Name</span>
-                                        <span>$@item.UnitPrice.ToString("N2")</span>
-                                    </div>
-                                }
-                                <hr class="my-2" style="opacity: 0.1">
-                                <div class="d-flex justify-content-between fw-bold">
-                                    <span>TOTAL / WADARTA</span>
-                                    <span class="text-primary">$@order.TotalAmount.ToString("N2")</span>
-                                </div>
+            <div class="col-md-6 col-xl-4">
+                <div class="active-order-card">
+                    <div class="aoc-header" style="background: @GetStatusGradient(order.Status);">
+                        <h6><i class="bi bi-grid-3x3 me-1"></i> Table @order.Table?.TableNumber</h6>
+                        <span class="aoc-badge">#@order.Id</span>
+                    </div>
+                    <div class="aoc-body">
+                        <small class="text-muted d-block mb-2" style="text-transform:uppercase; letter-spacing:.5px; font-size:.72rem;">Order Items</small>
+                        @foreach (var item in order.OrderItems)
+                        {
+                            <div class="aoc-item-row">
+                                <span>@item.Quantity × @item.MenuItem?.Name</span>
+                                <span>$@item.UnitPrice.ToString("N2")</span>
                             </div>
-
-                            <!-- Action Buttons -->
-                            <div class="d-grid gap-2">
-                                @if (order.Status == RestaurantManagement.Models.OrderStatus.Ready)
-                                {
-                                    <form asp-action="UpdateStatus" asp-controller="Order" method="post">
-                                        <input type="hidden" name="id" value="@order.Id" />
-                                        <input type="hidden" name="status" value="Delivered" />
-                                        <button type="submit" class="btn btn-success w-100 fw-bold text-white">
-                                            <i class="bi bi-check2-circle"></i> Mark Delivered / Gaarsii
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <button class="btn btn-light w-100 text-muted" disabled>
-                                        <i class="bi bi-hourglass-split"></i> In Progress / Wuu Socdaa...
-                                    </button>
-                                }
-                                <a href="@Url.Action("Details", "Order", new { id = order.Id })" class="btn btn-outline-primary w-100">
-                                    View Details / Faahfaahin
-                                </a>
-                            </div>
+                        }
+                        <div class="aoc-total-row">
+                            <span>Total</span>
+                            <span class="total-val">$@order.TotalAmount.ToString("N2")</span>
                         </div>
                     </div>
+                    <div class="aoc-actions">
+                        @if (order.Status == RestaurantManagement.Models.OrderStatus.Ready)
+                        {
+                            <form asp-action="UpdateStatus" asp-controller="Order" method="post">
+                                <input type="hidden" name="id" value="@order.Id" />
+                                <input type="hidden" name="status" value="Delivered" />
+                                <button type="submit" class="btn btn-success w-100 fw-bold">
+                                    <i class="bi bi-check2-circle"></i> Mark Delivered
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="text-center py-1">
+                                <span class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill" style="background: @GetStatusBg(order.Status); color: @GetStatusColor(order.Status); font-weight:600; font-size:0.85rem;">
+                                    <i class="bi bi-hourglass-split"></i> @order.Status
+                                </span>
+                            </div>
+                        }
+                        <a href="@Url.Action("Details", "Order", new { id = order.Id })" class="btn btn-outline-primary w-100 rounded-pill">
+                            View Details
+                        </a>
+                    </div>
                 </div>
-            }
-        }
-        else
-        {
-            <div class="col-12 text-center py-5">
-                <div class="text-muted opacity-50 display-1 mb-3"><i class="bi bi-clipboard-check"></i></div>
-                <h3>No Active Orders / Dalabaad Ma Jiraan</h3>
-                <p class="text-muted">You're all caught up! Ready to take a new order? / Diyaar ma u tahay dalab cusub?</p>
             </div>
         }
-    </div>
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="panel-card">
+                <div class="panel-body text-center py-5">
+                    <div class="text-muted display-1 mb-3" style="opacity:0.3;"><i class="bi bi-clipboard-check"></i></div>
+                    <h4 class="fw-bold text-dark">No Active Orders</h4>
+                    <p class="text-muted">You're all caught up! Ready to take a new order?</p>
+                    <a href="@Url.Action("Create", "Order")" class="btn btn-primary rounded-pill px-4 mt-2">
+                        <i class="bi bi-plus-circle me-1"></i> Create Order
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
-    <!-- Right Sidebar -->
-    <div class="col-lg-4">
-        <!-- Tables -->
-        <div class="card fade-in-up mb-4">
-            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
-                <h5 class="fw-bold m-0"><i class="bi bi-grid-3x3-gap"></i> Available Tables</h5>
+<div class="row g-4">
+    <!-- Available Tables -->
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5><i class="bi bi-grid-3x3-gap-fill me-2"></i>Available Tables</h5>
             </div>
-            <div class="card-body p-4">
-                <div class="row g-2">
+            <div class="panel-body">
+                <div class="row g-3">
                     @foreach (var table in Model.AvailableTables)
                     {
-                        <div class="col-4">
-                            <div class="table-availability-card available">
-                                <div class="table-icon"><i class="bi bi-check-circle-fill"></i></div>
-                                <div class="fw-bold">@table.TableNumber</div>
-                                <small class="text-muted">@table.Capacity <i class="bi bi-people-fill"></i></small>
+                        <div class="col-4 col-md-3">
+                            <div class="tbl-card avail">
+                                <div class="tbl-icon"><i class="bi bi-check-circle-fill"></i></div>
+                                <div class="tbl-num">@table.TableNumber</div>
+                                <div class="tbl-cap">@table.Capacity <i class="bi bi-people-fill"></i></div>
                             </div>
                         </div>
                     }
-                     @if (!Model.AvailableTables.Any())
+                    @if (!Model.AvailableTables.Any())
                     {
-                        <div class="col-12 text-center text-muted">All tables occupied</div>
+                        <div class="col-12 text-center text-muted py-4">
+                            <i class="bi bi-exclamation-circle me-1"></i> All tables are occupied
+                        </div>
                     }
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Quick Actions -->
-        <div class="card fade-in-up">
-            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
-                <h5 class="fw-bold m-0"><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+    <!-- Quick Actions -->
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5><i class="bi bi-lightning-charge-fill me-2"></i>Quick Actions</h5>
             </div>
-            <div class="card-body p-4">
-                <a href="@Url.Action("Create", "Order")" class="quick-action-btn-emp">
-                    <i class="bi bi-plus-circle"></i> New Order
+            <div class="panel-body">
+                <a href="@Url.Action("Create", "Order")" class="emp-quick-btn eqb-1">
+                    <i class="bi bi-plus-circle-fill"></i> New Order
                 </a>
-                <a href="@Url.Action("Index", "Order")" class="quick-action-btn-emp" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <i class="bi bi-list"></i> All Orders
+                <a href="@Url.Action("Index", "Order")" class="emp-quick-btn eqb-2">
+                    <i class="bi bi-list-ul"></i> All Orders
                 </a>
-                <a href="@Url.Action("Index", "Table")" class="quick-action-btn-emp" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <a href="@Url.Action("Index", "Table")" class="emp-quick-btn eqb-3">
                     <i class="bi bi-grid-3x3"></i> Manage Tables
                 </a>
             </div>
@@ -320,7 +488,6 @@
 @section Scripts {
     <script>
         function updateStatus(orderId, newStatus) {
-            // Add loading effect to button
             const btn = event.currentTarget;
             const originalContent = btn.innerHTML;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
@@ -334,7 +501,6 @@
                 body: `id=${orderId}&status=${newStatus}`
             }).then(res => {
                 if (res.ok) {
-                    // Success animation or flush
                     window.location.reload();
                 } else {
                     alert('Failed to update status. Please try again.');

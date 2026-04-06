@@ -29,12 +29,19 @@ namespace RestaurantManagement.Controllers
         /// Display the login page
         /// </summary>
         [HttpGet]
-        public IActionResult Login(string? returnUrl = null)
+        public async Task<IActionResult> Login(string? returnUrl = null)
         {
             // Redirect if already logged in
             if (User.Identity?.IsAuthenticated ?? false)
             {
-                return RedirectToAction("Index", "Dashboard");
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    return RedirectToAction("Index", "Dashboard");
+                }
+                
+                // If user is authenticated but not in database, clear the stale cookie
+                await _signInManager.SignOutAsync();
             }
 
             ViewData["ReturnUrl"] = returnUrl;
@@ -112,6 +119,110 @@ namespace RestaurantManagement.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+
+        /// <summary>
+        /// Display user profile
+        /// </summary>
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login");
+
+            var roles = await _userManager.GetRolesAsync(user);
+            
+            var model = new ProfileViewModel
+            {
+                FullName = user.FullName,
+                Email = user.Email ?? string.Empty,
+                CreatedDate = user.CreatedDate,
+                Role = roles.FirstOrDefault() ?? "Unknown"
+            };
+
+            return View(model);
+        }
+
+        /// <summary>
+        /// Update user profile
+        /// </summary>
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login");
+
+            user.FullName = model.FullName;
+            
+            var emailResult = await _userManager.SetEmailAsync(user, model.Email);
+            user.UserName = model.Email; // Keep UserName and Email synced
+            
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (emailResult.Succeeded && updateResult.Succeeded)
+            {
+                TempData["Success"] = "Profile updated successfully!";
+                return RedirectToAction("Profile");
+            }
+
+            foreach (var error in emailResult.Errors.Concat(updateResult.Errors))
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            // Restore non-editable fields if validation fails
+            var roles = await _userManager.GetRolesAsync(user);
+            model.Role = roles.FirstOrDefault() ?? "Unknown";
+            model.CreatedDate = user.CreatedDate;
+
+            return View(model);
+        }
+
+        /// <summary>
+        /// Display settings/change password page
+        /// </summary>
+        [HttpGet]
+        [Authorize]
+        public IActionResult Settings()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
+        /// <summary>
+        /// Process change password request
+        /// </summary>
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Settings(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login");
+
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(user);
+                TempData["Success"] = "Password changed successfully!";
+                return RedirectToAction("Settings");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
         }
 
         /// <summary>
